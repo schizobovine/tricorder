@@ -1,0 +1,12 @@
+[submodule "lib/Arduino-Makefile"]
+	path = lib/Arduino-Makefile
+	url = git@github.com:sudar/Arduino-Makefile.git
+[submodule "lib/Adafruit_SI1145"]
+	path = lib/Adafruit_SI1145
+	url = git@github.com:adafruit/Adafruit_SI1145_Library.git
+[submodule "lib/Adafruit_GFX"]
+	path = lib/Adafruit_GFX
+	url = git@github.com:adafruit/Adafruit-GFX-Library.git
+[submodule "lib/Adafruit_SSD1306"]
+	path = lib/Adafruit_SSD1306
+	url = git@github.com:schizobovine/Adafruit_SSD1306.git
