@@ -1,12 +1,13 @@
 ARDUINO_DIR       = $(realpath $(HOME)/arduino/arduino-current)
 ARDUINO_LIBS      := SPI Wire \
 	Adafruit_GFX Adafruit_SSD1306 \
-	Adafruit_Sensor  \
-	Adafruit_BMP280  \
-	Adafruit_HTU21DF \
-	Adafruit_LSM9DS0 \
-	Adafruit_TSL2561 \
-	Adafruit_TSL2591 \
+	Adafruit_Sensor   \
+	Adafruit_BMP280   \
+	Adafruit_HTU21DF  \
+	Adafruit_LSM9DS0  \
+	Adafruit_TCS34725 \
+	Adafruit_TSL2561  \
+	Adafruit_TSL2591  \
 	Adafruit_SI1145
 
 ARDUINO_PORT      := /dev/ttyACM0
