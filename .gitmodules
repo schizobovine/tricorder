@@ -28,3 +28,9 @@
 [submodule "lib/Adafruit_HTU21DF"]
 	path = lib/Adafruit_HTU21DF
 	url = git@github.com:schizobovine/Adafruit_HTU21DF.git
+[submodule "lib/Adafruit_MLX90614"]
+	path = lib/Adafruit_MLX90614
+	url = git@github.com:schizobovine/Adafruit_MLX90614.git
+[submodule "lib/Adafruit_TCS34725"]
+	path = lib/Adafruit_TCS34725
+	url = git@github.com:schizobovine/Adafruit_TCS34725.git
