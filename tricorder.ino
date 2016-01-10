@@ -20,8 +20,14 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Adafruit_SI1145.h>
 
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BMP280.h>
+#include <Adafruit_HTU21DF.h>
+#include <Adafruit_LSM9DS0.h>
+#include <Adafruit_SI1145.h>
+//#include <Adafruit_TSL2561.h>
+//#include <Adafruit_TSL2591.h>
 
 #define DISP_RST_PIN (-1)
 #define DISP_COLOR   WHITE
@@ -33,12 +39,16 @@ Adafruit_SSD1306 display(DISP_RST_PIN);
 
 // Sensors
 Adafruit_SI1145 si1145 = Adafruit_SI1145();
+Adafruit_BMP280 bmp280 = Adafruit_BMP280();
 
 ////////////////////////////////////////////////////////////////////////
 // SETUP
 ////////////////////////////////////////////////////////////////////////
 
 void setup() {
+
+  // Maybe the display is being dumb and not replying fast enough?
+  delay(200);
   
   // Init i2C
   Wire.begin();
@@ -48,10 +58,14 @@ void setup() {
   display.clearDisplay();
   display.setTextColor(DISP_COLOR);
   display.setTextSize(0);
-  display.print("Tricorder");
+  display.print("Tricorder Mk I");
   display.dim(false);
   display.setTextWrap(false);
   display.display();
+
+  // Init sensors
+  si1145.begin();
+  bmp280.begin();
 
   // Serial barf
   //Serial.begin(9600);
@@ -60,6 +74,7 @@ void setup() {
 
   // For zee debugging
   pinMode(13, OUTPUT);  
+  delay(500);
 
 }
 
@@ -69,17 +84,31 @@ void setup() {
 
 void loop() {
   
-  uint32_t now = millis();
+  //uint32_t now = millis();
+
   display.clearDisplay();
-  display.setCursor(0, 8);
-  display.print(now);
+
+  display.setCursor(0, 0);
+  display.print("Tricorder Mk I");
+
+  display.setCursor(0, 16);
+  display.print("UV Idx ");
+  display.print(((float)si1145.readUV()) / 100.0, 2);
+
+  display.setCursor(0, 24);
+  display.print("TempC ");
+  display.print(bmp280.readTemperature(), 2);
+
+  display.setCursor(0, 32);
+  display.print("P(hPa) ");
+  display.print(bmp280.readPressure() / 100.0, 2);
+
+  display.setCursor(0, 40);
+  display.print("Alt(m) ");
+  display.print(bmp280.readAltitude(), 1);
+  
   display.display();
 
-  //Serial.println(now);
-
-  digitalWrite(13, HIGH);
-  delay(1000);
-  digitalWrite(13, LOW);
   delay(1000);
 
 }
