@@ -10,3 +10,21 @@
 [submodule "lib/Adafruit_SSD1306"]
 	path = lib/Adafruit_SSD1306
 	url = git@github.com:schizobovine/Adafruit_SSD1306.git
+[submodule "lib/Adafruit_BMP280"]
+	path = lib/Adafruit_BMP280
+	url = git@github.com:schizobovine/Adafruit_BMP280.git
+[submodule "lib/Adafruit_Sensor"]
+	path = lib/Adafruit_Sensor
+	url = git@github.com:schizobovine/Adafruit_Sensor.git
+[submodule "lib/Adafruit_TSL2591"]
+	path = lib/Adafruit_TSL2591
+	url = git@github.com:schizobovine/Adafruit_TSL2591.git
+[submodule "lib/Adafruit_LSM9DS0"]
+	path = lib/Adafruit_LSM9DS0
+	url = git@github.com:schizobovine/Adafruit_LSM9DS0.git
+[submodule "lib/Adafruit_TSL2561"]
+	path = lib/Adafruit_TSL2561
+	url = git@github.com:schizobovine/Adafruit_TSL2561.git
+[submodule "lib/Adafruit_HTU21DF"]
+	path = lib/Adafruit_HTU21DF
+	url = git@github.com:schizobovine/Adafruit_HTU21DF.git
