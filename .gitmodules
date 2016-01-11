@@ -34,3 +34,6 @@
 [submodule "lib/Adafruit_TCS34725"]
 	path = lib/Adafruit_TCS34725
 	url = git@github.com:schizobovine/Adafruit_TCS34725.git
+[submodule "lib/Adafruit_BluefruitLE_nRF51"]
+	path = lib/Adafruit_BluefruitLE_nRF51
+	url = git@github.com:schizobovine/Adafruit_BluefruitLE_nRF51.git
