@@ -21,7 +21,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-#include <Adafruit_Sensor.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_HTU21DF.h>
 #include <Adafruit_LSM9DS0.h>

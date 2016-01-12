@@ -2,7 +2,6 @@ ARDUINO_DIR       = $(realpath $(HOME)/arduino/arduino-current)
 ARDUINO_LIBS      := SPI Wire \
 	Adafruit_BluefruitLE_nRF51 \
 	Adafruit_GFX Adafruit_SSD1306 \
-	Adafruit_Sensor   \
 	Adafruit_BMP280   \
 	Adafruit_HTU21DF  \
 	Adafruit_LSM9DS0  \
