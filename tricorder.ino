@@ -82,12 +82,12 @@ void setup() {
   // Init display
   display.begin(DISP_MODE, DISP_ADDR);
   display.clearDisplay();
-  //display.setTextColor(DISP_COLOR);
-  //display.setTextSize(0);
-  //display.print(F("Tricorder Mk I"));
+  display.setTextColor(DISP_COLOR);
+  display.setTextSize(0);
+  display.print(F("Tricorder Mk I"));
   display.dim(false);
   display.setTextWrap(false);
-  //display.display();
+  display.display();
 
   // Init sensors
   bmp280.begin();
