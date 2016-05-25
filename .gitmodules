@@ -22,3 +22,9 @@
 [submodule "lib/Adafruit_SSD1351"]
 	path = lib/Adafruit_SSD1351
 	url = git@github.com:adafruit/Adafruit-SSD1351-library.git
+[submodule "lib/Adafruit_VEML6070"]
+	path = lib/Adafruit_VEML6070
+	url = git@github.com:schizobovine/Adafruit_VEML6070.git
+[submodule "lib/Adafruit_BNO055"]
+	path = lib/Adafruit_BNO055
+	url = git@github.com:adafruit/Adafruit_BNO055.git
