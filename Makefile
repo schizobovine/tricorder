@@ -7,13 +7,15 @@ ARDUINO_LIBS      := SPI Wire \
 	Adafruit_MLX90614 \
 	Adafruit_TCS34725 \
 	Adafruit_VEML6070
+ARDUINO_PLATFORM_LIB_PATH := $(realpath $(HOME)/sketchbook/hardware/adafruit/samd/libraries/)
 
 ARDUINO_PORT      := /dev/ttyACM0
 USER_LIB_PATH     := $(realpath ./lib)
 
-ARCHITECTURE      = avr
+ARCHITECTURE      = samd
 ALTERNATE_CORE    = adafruit
-BOARD_TAG         = feather32u4
+BOARD_TAG         = adafruit_feather_m0
+#BOARD_SUB         = 
 
 #CXXFLAGS      += -std=gnu++11 -Wl,-u,vfprintf
 #CFLAGS        += -std=gnu11 -Wl,-u,vfprintf
