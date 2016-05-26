@@ -22,3 +22,9 @@
 [submodule "lib/Adafruit_BNO055"]
 	path = lib/Adafruit_BNO055
 	url = git@github.com:schizobovine/Adafruit_BNO055.git
+[submodule "lib/Adafruit_SSD1351"]
+	path = lib/Adafruit_SSD1351
+	url = git@github.com:schizobovine/Adafruit_SSD1351.git
+[submodule "lib/Adafruit_GFX"]
+	path = lib/Adafruit_GFX
+	url = git@github.com:schizobovine/Adafruit_GFX.git
