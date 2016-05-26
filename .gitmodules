@@ -25,3 +25,6 @@
 [submodule "lib/Adafruit_Sensor"]
 	path = lib/Adafruit_Sensor
 	url = git@github.com:schizobovine/Adafruit_Sensor.git
+[submodule "lib/Adafruit_BNO055"]
+	path = lib/Adafruit_BNO055
+	url = git@github.com:schizobovine/Adafruit_BNO055.git
