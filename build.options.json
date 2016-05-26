@@ -1,0 +1,10 @@
+{
+  "builtInLibrariesFolders": "/home/sean/arduino/arduino-current/libraries",
+  "customBuildProperties": "",
+  "fqbn": "arduino:avr:uno",
+  "hardwareFolders": "/home/sean/arduino/arduino-current/hardware",
+  "otherLibrariesFolders": "/home/sean/git/tricorder/lib,/home/sean/git/tricorder/lib/Adafruit_BNO055/utility",
+  "runtime.ide.version": "10600",
+  "sketchLocation": "/home/sean/git/tricorder/tricorder.ino",
+  "toolsFolders": "/home/sean/arduino/arduino-current/hardware/tools/,/home/sean/arduino/arduino-current/tools/,/home/sean/arduino/arduino-current/tools-builder/"
+}
