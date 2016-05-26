@@ -5,6 +5,6 @@
   "hardwareFolders": "/home/sean/arduino/arduino-current/hardware",
   "otherLibrariesFolders": "/home/sean/git/tricorder/lib",
   "runtime.ide.version": "10600",
-  "sketchLocation": "/home/sean/git/tricorder/tricorder.ino",
+  "sketchLocation": "/home/sean/git/tricorder/src/tricorder.ino",
   "toolsFolders": "/home/sean/arduino/arduino-current/hardware/tools/,/home/sean/arduino/arduino-current/tools/,/home/sean/arduino/arduino-current/tools-builder/"
 }
