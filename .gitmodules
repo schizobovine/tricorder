@@ -1,6 +1,3 @@
-[submodule "lib/Adafruit_GFX"]
-	path = lib/Adafruit_GFX
-	url = git@github.com:adafruit/Adafruit-GFX-Library.git
 [submodule "lib/Adafruit_BMP280"]
 	path = lib/Adafruit_BMP280
 	url = git@github.com:schizobovine/Adafruit_BMP280.git
@@ -16,9 +13,6 @@
 [submodule "lib/Adafruit_BluefruitLE_nRF51"]
 	path = lib/Adafruit_BluefruitLE_nRF51
 	url = git@github.com:schizobovine/Adafruit_BluefruitLE_nRF51.git
-[submodule "lib/Adafruit_SSD1351"]
-	path = lib/Adafruit_SSD1351
-	url = git@github.com:adafruit/Adafruit-SSD1351-library.git
 [submodule "lib/Adafruit_VEML6070"]
 	path = lib/Adafruit_VEML6070
 	url = git@github.com:schizobovine/Adafruit_VEML6070.git
