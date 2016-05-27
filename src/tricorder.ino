@@ -12,7 +12,7 @@
 #include <SPI.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
-//#include <Adafruit_SSD1351.h>
+#include <Adafruit_SSD1351.h>
 #include <Adafruit_BLE.h>
 #include <Adafruit_BluefruitLE_SPI.h>
 
