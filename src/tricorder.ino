@@ -11,6 +11,17 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
+#include <Adafruit_GFX.h>
+//#include <Adafruit_SSD1351.h>
+//#include <Adafruit_BLE.h>
+//#include <Adafruit_BluefruitLE_SPI.h>
+
+#include <Adafruit_Sensor.h>
+//#include <Adafruit_BNO055.h>
+//#include <Adafruit_MLX90614.h>
+//#include <Adafruit_TCS34725.h>
+//#include <Adafruit_TSL2591.h>
+//#include <Adafruit_VEML6070.h>
 
 #define BATT_DIV_PIN 9
 
