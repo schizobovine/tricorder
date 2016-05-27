@@ -33,6 +33,9 @@
 
 #define DEFAULT_PRESSURE 1000.0
 
+#define PRINT(...) do { Serial.print(__VA_ARGS__); ble.print(__VA_ARGS__); } while (0);
+#define PRINTLN(...) do { Serial.println(__VA_ARGS__); ble.println(__VA_ARGS__); } while (0);
+
 ////////////////////////////////////////////////////////////////////////
 // GLOBAL OBJECTS
 ////////////////////////////////////////////////////////////////////////
@@ -117,10 +120,10 @@ void loop() {
   float press = bmp280.readPressure();
   float alt = bmp280.readAltitude(DEFAULT_PRESSURE);
 
-  Serial.println("BMP280");
-  Serial.print("T   = "); Serial.println(bmp280_temp);
-  Serial.print("P   = "); Serial.print(press); Serial.println("Pa");
-  Serial.print("Alt = "); Serial.print(alt); Serial.println("m");
+  PRINTLN("BMP280");
+  PRINT("T   = "); PRINTLN(bmp280_temp);
+  PRINT("P   = "); PRINT(press); PRINTLN("Pa");
+  PRINT("Alt = "); PRINT(alt); PRINTLN("m");
 
   imu::Vector<3> euler = bno055.getVector(Adafruit_BNO055::VECTOR_EULER);
   float x = euler.x();
@@ -129,55 +132,55 @@ void loop() {
   uint8_t cal_sys, cal_gyro, cal_acc, cal_mag;
   bno055.getCalibration(&cal_sys, &cal_gyro, &cal_acc, &cal_mag);
 
-  Serial.println("BNO055");
-  Serial.print("X = "); Serial.println(x);
-  Serial.print("Y = "); Serial.println(y);
-  Serial.print("Z = "); Serial.println(z);
-  Serial.print("Calibration (Sys)  = "); Serial.println(cal_sys);
-  Serial.print("Calibration (Gyro) = "); Serial.println(cal_gyro);
-  Serial.print("Calibration (Acc)  = "); Serial.println(cal_acc);
-  Serial.print("Calibration (Mag)  = "); Serial.println(cal_mag);
+  PRINTLN("BNO055");
+  PRINT("X = "); PRINTLN(x);
+  PRINT("Y = "); PRINTLN(y);
+  PRINT("Z = "); PRINTLN(z);
+  PRINT("Calibration (Sys)  = "); PRINTLN(cal_sys);
+  PRINT("Calibration (Gyro) = "); PRINTLN(cal_gyro);
+  PRINT("Calibration (Acc)  = "); PRINTLN(cal_acc);
+  PRINT("Calibration (Mag)  = "); PRINTLN(cal_mag);
 
   float ir_amb_c = mlx90614.readAmbientTempC();
   float ir_amb_f = mlx90614.readAmbientTempF();
   float ir_obj_c = mlx90614.readObjectTempC();
   float ir_obj_f = mlx90614.readObjectTempF();
 
-  Serial.println("MLX90614");
-  Serial.print("Ambient = "); Serial.print(ir_amb_c); Serial.println("C");
-  Serial.print("          "); Serial.print(ir_amb_f); Serial.println("F");
-  Serial.print("Object  = "); Serial.print(ir_obj_c); Serial.println("C");
-  Serial.print("          "); Serial.print(ir_obj_f); Serial.println("F");
+  PRINTLN("MLX90614");
+  PRINT("Ambient = "); PRINT(ir_amb_c); PRINTLN("C");
+  PRINT("          "); PRINT(ir_amb_f); PRINTLN("F");
+  PRINT("Object  = "); PRINT(ir_obj_c); PRINTLN("C");
+  PRINT("          "); PRINT(ir_obj_f); PRINTLN("F");
 
   float sht31_temp = sht31.readTemperature();
   float humidity = sht31.readHumidity();
 
-  Serial.println("SHT31");
-  Serial.print("T = "); Serial.println(sht31_temp);
-  Serial.print("RH% = "); Serial.println(humidity);
+  PRINTLN("SHT31");
+  PRINT("T = "); PRINTLN(sht31_temp);
+  PRINT("RH% = "); PRINTLN(humidity);
 
   uint16_t r, g, b, c;
   tcs34725.getRawData(&r, &g, &b, &c);
   uint16_t colorTemp = tcs34725.calculateColorTemperature(r, g, b);
   uint16_t lux = tcs34725.calculateLux(r, g, b);
 
-  Serial.println("TCS34725");
-  Serial.print("R = "); Serial.println(r);
-  Serial.print("G = "); Serial.println(g);
-  Serial.print("B = "); Serial.println(b);
-  Serial.print("C = "); Serial.println(c);
-  Serial.print("Color Temp = "); Serial.println(colorTemp);
-  Serial.print("Lux = "); Serial.println(lux);
+  PRINTLN("TCS34725");
+  PRINT("R = "); PRINTLN(r);
+  PRINT("G = "); PRINTLN(g);
+  PRINT("B = "); PRINTLN(b);
+  PRINT("C = "); PRINTLN(c);
+  PRINT("Color Temp = "); PRINTLN(colorTemp);
+  PRINT("Lux = "); PRINTLN(lux);
 
   uint16_t vis = tsl2591.getLuminosity(TSL2591_VISIBLE);
   uint16_t ir = tsl2591.getLuminosity(TSL2591_INFRARED);
 
-  Serial.println("TSL2591");
+  PRINTLN("TSL2591");
 
   float uv = veml6070.readUV();
 
-  Serial.println("VEML6070");
-  Serial.print("UV = "); Serial.println(uv);
+  PRINTLN("VEML6070");
+  PRINT("UV = "); PRINTLN(uv);
 
   delay(1000);
 
