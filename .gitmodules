@@ -28,3 +28,6 @@
 [submodule "lib/Adafruit_GFX"]
 	path = lib/Adafruit_GFX
 	url = git@github.com:schizobovine/Adafruit_GFX.git
+[submodule "lib/Adafruit_SHT31"]
+	path = lib/Adafruit_SHT31
+	url = git@github.com:schizobovine/Adafruit_SHT31.git
