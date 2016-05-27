@@ -17,11 +17,13 @@
 #include <Adafruit_BluefruitLE_SPI.h>
 
 #include <Adafruit_Sensor.h>
-//#include <Adafruit_BNO055.h>
-//#include <Adafruit_MLX90614.h>
-//#include <Adafruit_TCS34725.h>
-//#include <Adafruit_TSL2591.h>
-//#include <Adafruit_VEML6070.h>
+#include <Adafruit_BMP280.h>
+#include <Adafruit_BNO055.h>
+#include <Adafruit_MLX90614.h>
+#include <Adafruit_SHT31.h>
+#include <Adafruit_TCS34725.h>
+#include <Adafruit_TSL2591.h>
+#include <Adafruit_VEML6070.h>
 
 #define BATT_DIV_PIN 9
 
