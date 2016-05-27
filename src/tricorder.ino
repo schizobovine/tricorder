@@ -13,8 +13,8 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 //#include <Adafruit_SSD1351.h>
-//#include <Adafruit_BLE.h>
-//#include <Adafruit_BluefruitLE_SPI.h>
+#include <Adafruit_BLE.h>
+#include <Adafruit_BluefruitLE_SPI.h>
 
 #include <Adafruit_Sensor.h>
 //#include <Adafruit_BNO055.h>
