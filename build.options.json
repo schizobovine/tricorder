@@ -1,10 +1,10 @@
 {
   "builtInLibrariesFolders": "/home/sean/arduino/arduino-current/libraries",
   "customBuildProperties": "",
-  "fqbn": "arduino:avr:uno",
-  "hardwareFolders": "/home/sean/arduino/arduino-current/hardware",
+  "fqbn": "adafruit:samd:adafruit_feather_m0",
+  "hardwareFolders": "/home/sean/arduino/arduino-current/hardware,/home/sean/.arduino15/packages",
   "otherLibrariesFolders": "/home/sean/git/tricorder/lib",
-  "runtime.ide.version": "10600",
+  "runtime.ide.version": "10609",
   "sketchLocation": "/home/sean/git/tricorder/src/tricorder.ino",
-  "toolsFolders": "/home/sean/arduino/arduino-current/hardware/tools/,/home/sean/arduino/arduino-current/tools/,/home/sean/arduino/arduino-current/tools-builder/"
+  "toolsFolders": "/home/sean/arduino/arduino-current/tools-builder/,/home/sean/arduino/arduino-current/hardware/tools/avr,/home/sean/.arduino15/packages"
 }

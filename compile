@@ -1,3 +1,30 @@
 #!/bin/sh
+set -x
 
-arduino-builder -build-options-file=./build.options.json -verbose -compile src/tricorder.ino
+# Target build output location
+TARGET="$(readlink -f ./build)"
+
+# Create temp build dir we'll move crap out of after compile
+BUILDDIR="$(mktemp --tmpdir -d arduino-builder-XXXXXX)"
+
+# Ensure tempdir cleanup
+trap "rm -rf \"${BUILDDIR}\"" EXIT
+
+# Copy results from previous builds, if they exist, to tempdir
+if [ -d "${TARGET}" ]; then
+  rsync -a --delete-after "${TARGET}/" "${BUILDDIR}"
+fi
+
+# Do actual build
+arduino-builder \
+  -build-options-file=./build.options.json \
+  -build-path="${BUILDDIR}" \
+  -verbose \
+  -compile \
+  src/tricorder.ino
+
+# If build worked, copy results to target
+if [ $? ]; then
+  mkdir -p "${TARGET}"
+  rsync -a --delete-after "${BUILDDIR}/" "${TARGET}"
+fi
