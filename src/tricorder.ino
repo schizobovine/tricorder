@@ -11,6 +11,8 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
+#include <SD.h>
+
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1351.h>
 #include <Adafruit_BLE.h>
@@ -25,20 +27,39 @@
 #include <Adafruit_TSL2591.h>
 #include <Adafruit_VEML6070.h>
 
-#define BATT_DIV_PIN A7
+#define BATT_DIV_PIN   A7
 
-#define BLE_CS  8
-#define BLE_IRQ 7
-#define BLE_RST 4
+#define SD_CARDDETECT  A1
+#define SD_CS          A2
+
+#define DISP_CS        A3
+#define DISP_DC        A4
+#define DISP_RST       A5
+
+#define BLE_CS         8
+#define BLE_IRQ        7
+#define BLE_RST        4
 
 #define DEFAULT_PRESSURE 1000.0
+#define LOG_FILE_NAME "data.log"
 
-#define PRINT(...) do { Serial.print(__VA_ARGS__); ble.print(__VA_ARGS__); } while (0);
-#define PRINTLN(...) do { Serial.println(__VA_ARGS__); ble.println(__VA_ARGS__); } while (0);
+#define PRINT(...) do { \
+    Serial.print(__VA_ARGS__); \
+    ble.print(__VA_ARGS__); \
+    if (logFile) { logFile.print(__VA_ARGS__); } \
+  } while (0);
+
+#define PRINTLN(...) do { \
+    Serial.println(__VA_ARGS__); \
+    ble.println(__VA_ARGS__); \
+    if (logFile) { logFile.println(__VA_ARGS__); } \
+  } while (0);
 
 ////////////////////////////////////////////////////////////////////////
 // GLOBAL OBJECTS
 ////////////////////////////////////////////////////////////////////////
+
+Adafruit_SSD1351 display = Adafruit_SSD1351(DISP_CS, DISP_DC, DISP_RST);
 
 Adafruit_BluefruitLE_SPI ble(BLE_CS, BLE_IRQ, BLE_RST);
 
@@ -49,6 +70,8 @@ Adafruit_SHT31 sht31;
 Adafruit_TCS34725 tcs34725;
 Adafruit_TSL2591 tsl2591;
 Adafruit_VEML6070 veml6070;
+
+File logFile;
 
 ////////////////////////////////////////////////////////////////////////
 // HALPING
@@ -92,6 +115,16 @@ void setup() {
   ble.begin(true);
   ble.echo(false);
   ble.info();
+
+  // Open log on SD card if present
+  pinMode(SD_CARDDETECT, INPUT_PULLUP);
+  if (digitalRead(SD_CARDDETECT)) {
+    if (!SD.begin(SD_CS)) {
+      PRINTLN("No SD card, disabling log");
+    } else {
+      logFile = SD.open(LOG_FILE_NAME, FILE_WRITE);
+    }
+  }
 
   // For zee debugging
   pinMode(13, OUTPUT);
