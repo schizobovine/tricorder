@@ -234,34 +234,30 @@
 <wire x1="0.97" y1="1.97" x2="0.97" y2="-1.97" width="0.0508" layer="39"/>
 <wire x1="0.97" y1="-1.97" x2="-0.97" y2="-1.97" width="0.0508" layer="39"/>
 </package>
-<package name="SO08">
-<description>&lt;b&gt;Small Outline Package&lt;/b&gt; Fits JEDEC packages (narrow SOIC-8)</description>
-<smd name="1" x="-1.905" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<smd name="2" x="-0.635" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<smd name="3" x="0.635" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<smd name="4" x="1.905" y="-2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<smd name="5" x="1.905" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<smd name="6" x="0.635" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<smd name="7" x="-0.635" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<smd name="8" x="-1.905" y="2.6162" dx="0.6096" dy="2.2098" layer="1"/>
-<text x="0" y="0" size="0.4064" layer="27" font="vector" ratio="12" align="center">&gt;VALUE</text>
-<text x="-2.54" y="0" size="0.4064" layer="25" font="vector" ratio="12" rot="R90" align="bottom-center">&gt;NAME</text>
-<wire x1="2.413" y1="1.778" x2="2.413" y2="-1.778" width="0.1524" layer="21"/>
-<wire x1="-1.4224" y1="1.778" x2="-1.1176" y2="1.778" width="0.1524" layer="21"/>
-<wire x1="-0.1524" y1="1.778" x2="0.1524" y2="1.778" width="0.1524" layer="21"/>
-<wire x1="1.1176" y1="1.778" x2="1.4224" y2="1.778" width="0.1524" layer="21"/>
-<wire x1="-2.413" y1="1.778" x2="-2.3876" y2="1.778" width="0.1524" layer="21"/>
-<wire x1="2.413" y1="1.778" x2="2.3876" y2="1.778" width="0.1524" layer="21"/>
-<wire x1="-1.4224" y1="-1.778" x2="-1.1176" y2="-1.778" width="0.1524" layer="21"/>
-<wire x1="-0.1524" y1="-1.778" x2="0.1524" y2="-1.778" width="0.1524" layer="21"/>
-<wire x1="1.1176" y1="-1.778" x2="1.4224" y2="-1.778" width="0.1524" layer="21"/>
-<wire x1="2.413" y1="-1.778" x2="2.3876" y2="-1.778" width="0.1524" layer="21"/>
-<wire x1="-2.413" y1="-1.778" x2="-2.3876" y2="-1.778" width="0.1524" layer="21"/>
-<wire x1="-2.413" y1="1.778" x2="2.413" y2="1.778" width="0.1524" layer="51"/>
-<wire x1="-2.413" y1="-1.778" x2="2.413" y2="-1.778" width="0.1524" layer="51"/>
-<wire x1="-2.413" y1="-1.778" x2="-2.413" y2="-0.508" width="0.1524" layer="21"/>
-<wire x1="-2.413" y1="0.508" x2="-2.413" y2="1.778" width="0.1524" layer="21"/>
-<wire x1="-2.413" y1="-0.508" x2="-2.413" y2="0.508" width="0.1524" layer="21" curve="180"/>
+<package name="SO14">
+<wire x1="4.6228" y1="2" x2="4.6228" y2="-1.998" width="0.2" layer="21"/>
+<wire x1="4.6228" y1="-1.998" x2="-4.6228" y2="-1.998" width="0.2" layer="21"/>
+<wire x1="4.6228" y1="2" x2="-4.6228" y2="2" width="0.2" layer="21"/>
+<wire x1="-4.6228" y1="-1.998" x2="-4.6228" y2="-0.6604" width="0.2" layer="21"/>
+<wire x1="-4.572" y1="0.6096" x2="-4.572" y2="-0.6604" width="0.2" layer="21" curve="-180"/>
+<wire x1="-4.6228" y1="2" x2="-4.6228" y2="0.6096" width="0.2" layer="21"/>
+<smd name="1" x="-3.81" y="-2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="2" x="-2.54" y="-2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="3" x="-1.27" y="-2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="4" x="0" y="-2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="5" x="1.27" y="-2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="6" x="2.54" y="-2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="7" x="3.81" y="-2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="8" x="3.81" y="2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="9" x="2.54" y="2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="10" x="1.27" y="2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="11" x="0" y="2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="12" x="-1.27" y="2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="13" x="-2.54" y="2.8" dx="0.6" dy="1.2" layer="1"/>
+<smd name="14" x="-3.81" y="2.8" dx="0.6" dy="1.2" layer="1"/>
+<text x="-4.826" y="0" size="0.6096" layer="25" font="vector" ratio="12" rot="R90" align="bottom-center">&gt;NAME</text>
+<text x="0" y="0" size="0.8128" layer="27" font="vector" ratio="12" align="center">&gt;VALUE</text>
+<circle x="-3.81" y="-1.397" radius="0.254" width="0" layer="21"/>
 </package>
 </packages>
 </library>
@@ -456,15 +452,108 @@ design rules under a new name.</description>
 <attribute name="DESIGNER" value="sean@yak.net" x="13.97" y="-3.81" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C1" library="a_parts" package="C0603" value="100n" x="8.255" y="15.875"/>
-<element name="PD2" library="a_parts" package="LED3528" value="GUVB-S11SD" x="1.905" y="-12.065"/>
-<element name="PD1" library="a_parts" package="LED3528" value="GUVA-S12SD" x="1.905" y="-17.78"/>
-<element name="PD3" library="a_parts" package="LED-0805" value="SD019-141-411-R" x="-3.175" y="-19.05"/>
-<element name="PD4" library="a_parts" package="LED-0805" value="SD019-141-411-G" x="-6.35" y="-19.05"/>
-<element name="PD5" library="a_parts" package="LED-0805" value="SD019-141-411-B" x="-9.525" y="-19.05"/>
-<element name="PD6" library="a_parts" package="LED-0805" value="SD019-111-411" x="-12.7" y="-19.05"/>
-<element name="U1" library="a_parts" package="SO08" value="" x="-16.51" y="-17.145"/>
+<element name="PD6" library="a_parts" package="LED3528" value="GUVB-S11SD" x="1.905" y="-12.065"/>
+<element name="PD5" library="a_parts" package="LED3528" value="GUVA-S12SD" x="1.905" y="-17.78"/>
+<element name="PD1" library="a_parts" package="LED-0805" value="SD019-141-411-R" x="-3.175" y="-19.05"/>
+<element name="PD2" library="a_parts" package="LED-0805" value="SD019-141-411-G" x="-6.35" y="-19.05"/>
+<element name="PD3" library="a_parts" package="LED-0805" value="SD019-141-411-B" x="-9.525" y="-19.05"/>
+<element name="PD4" library="a_parts" package="LED-0805" value="SD019-111-411" x="-12.7" y="-19.05"/>
+<element name="PD7" library="a_parts" package="LED-0805" value="SD019-141-411-IR" x="-21.59" y="-19.05"/>
+<element name="U1" library="a_parts" package="SO14" value="" x="-17.145" y="-24.765"/>
+<element name="U2" library="a_parts" package="SO14" value="" x="-17.145" y="-32.385"/>
+<element name="C2" library="a_parts" package="C0603" value="100n" x="-19.685" y="-38.1"/>
 </elements>
 <signals>
+<signal name="GND">
+<contactref element="U1" pad="11"/>
+<contactref element="U2" pad="11"/>
+<contactref element="C1" pad="2"/>
+<contactref element="C2" pad="2"/>
+<wire x1="-17.145" y1="-29.585" x2="-18.835" y2="-38.1" width="0" layer="19" extent="1-1"/>
+<wire x1="-17.145" y1="-21.965" x2="-17.145" y2="-29.585" width="0" layer="19" extent="1-1"/>
+<wire x1="9.105" y1="15.875" x2="-17.145" y2="-21.965" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="3.3V">
+<contactref element="U1" pad="4"/>
+<contactref element="U2" pad="4"/>
+<contactref element="C1" pad="1"/>
+<contactref element="C2" pad="1"/>
+<wire x1="-17.145" y1="-35.185" x2="-20.535" y2="-38.1" width="0" layer="19" extent="1-1"/>
+<wire x1="-17.145" y1="-27.565" x2="-17.145" y2="-35.185" width="0" layer="19" extent="1-1"/>
+<wire x1="7.405" y1="15.875" x2="-17.145" y2="-27.565" width="0" layer="19" extent="1-1"/>
+</signal>
+<signal name="INA+">
+<contactref element="U1" pad="3"/>
+</signal>
+<signal name="INA-">
+<contactref element="U1" pad="2"/>
+</signal>
+<signal name="OUTC">
+<contactref element="U1" pad="8"/>
+</signal>
+<signal name="INB+">
+<contactref element="U1" pad="5"/>
+</signal>
+<signal name="INB-">
+<contactref element="U1" pad="6"/>
+</signal>
+<signal name="IND-">
+<contactref element="U1" pad="13"/>
+</signal>
+<signal name="IND+">
+<contactref element="U1" pad="12"/>
+</signal>
+<signal name="OUTB">
+<contactref element="U1" pad="7"/>
+</signal>
+<signal name="INC-">
+<contactref element="U1" pad="9"/>
+</signal>
+<signal name="INC+">
+<contactref element="U1" pad="10"/>
+</signal>
+<signal name="OUTA">
+<contactref element="U1" pad="1"/>
+</signal>
+<signal name="OUTD">
+<contactref element="U1" pad="14"/>
+</signal>
+<signal name="INE+">
+<contactref element="U2" pad="3"/>
+</signal>
+<signal name="INE-">
+<contactref element="U2" pad="2"/>
+</signal>
+<signal name="INF+">
+<contactref element="U2" pad="5"/>
+</signal>
+<signal name="INF-">
+<contactref element="U2" pad="6"/>
+</signal>
+<signal name="OUTH">
+<contactref element="U2" pad="14"/>
+</signal>
+<signal name="OUTG">
+<contactref element="U2" pad="8"/>
+</signal>
+<signal name="OUTE">
+<contactref element="U2" pad="1"/>
+</signal>
+<signal name="OUTF">
+<contactref element="U2" pad="7"/>
+</signal>
+<signal name="ING+">
+<contactref element="U2" pad="10"/>
+</signal>
+<signal name="ING-">
+<contactref element="U2" pad="9"/>
+</signal>
+<signal name="INH+">
+<contactref element="U2" pad="12"/>
+</signal>
+<signal name="INH-">
+<contactref element="U2" pad="13"/>
+</signal>
 </signals>
 </board>
 </drawing>
