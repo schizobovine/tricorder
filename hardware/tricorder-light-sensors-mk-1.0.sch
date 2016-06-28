@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="100" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="50" altunitdist="mil" altunit="mil"/>
+<grid distance="100" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="2" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
@@ -264,21 +264,6 @@ chip</description>
 <wire x1="-2.4" y1="1.1" x2="2.4" y2="1.1" width="0.1524" layer="21"/>
 <wire x1="2.4" y1="1.1" x2="2.4" y2="-1.1" width="0.1524" layer="21"/>
 <wire x1="2.4" y1="-1.1" x2="-2.4" y2="-1.1" width="0.1524" layer="21"/>
-</package>
-<package name="C1210">
-<description>&lt;b&gt;CAPACITOR&lt;/b&gt;</description>
-<wire x1="-2.42" y1="1.42" x2="2.42" y2="1.42" width="0.1524" layer="39"/>
-<wire x1="2.42" y1="-1.42" x2="-2.42" y2="-1.42" width="0.1524" layer="39"/>
-<wire x1="-2.42" y1="-1.42" x2="-2.42" y2="1.42" width="0.1524" layer="39"/>
-<wire x1="2.42" y1="1.42" x2="2.42" y2="-1.42" width="0.1524" layer="39"/>
-<smd name="1" x="-1.4" y="0" dx="1.6" dy="2.7" layer="1"/>
-<smd name="2" x="1.4" y="0" dx="1.6" dy="2.7" layer="1"/>
-<text x="-2.54" y="0" size="0.8" layer="25" font="vector" ratio="12" rot="R90" align="bottom-center">&gt;NAME</text>
-<text x="2.54" y="0" size="0.7" layer="27" font="vector" ratio="12" rot="R90" align="top-center">&gt;VALUE</text>
-<wire x1="-2.4" y1="-1.6" x2="-2.4" y2="1.6" width="0.1524" layer="21"/>
-<wire x1="-2.4" y1="1.6" x2="2.4" y2="1.6" width="0.1524" layer="21"/>
-<wire x1="2.4" y1="1.6" x2="2.4" y2="-1.6" width="0.1524" layer="21"/>
-<wire x1="2.4" y1="-1.6" x2="-2.4" y2="-1.6" width="0.1524" layer="21"/>
 </package>
 <package name="C1310">
 <description>&lt;b&gt;CAPACITOR&lt;/b&gt;</description>
@@ -1943,26 +1928,6 @@ Source: AVX .. aphvc.pdf</description>
 <text x="-1.27" y="7.12" size="0.8" layer="21" font="vector" ratio="12" align="bottom-center">VCC</text>
 <text x="1.27" y="7.12" size="0.8" layer="21" font="vector" ratio="12" align="bottom-center">SDA</text>
 <text x="3.81" y="7.12" size="0.8" layer="21" font="vector" ratio="12" align="bottom-center">SCL</text>
-</package>
-<package name="1X04-JST-PH-RA-PTH-I2C-CENTERED">
-<wire x1="-4" y1="0" x2="-4.5" y2="0" width="0.25" layer="21"/>
-<wire x1="-4.5" y1="0" x2="-4.5" y2="-1.6" width="0.25" layer="21"/>
-<wire x1="-4.5" y1="-1.6" x2="-4.95" y2="-1.6" width="0.25" layer="21"/>
-<wire x1="-4.95" y1="-1.6" x2="-4.95" y2="6" width="0.25" layer="21"/>
-<wire x1="-4.95" y1="6" x2="4.95" y2="6" width="0.25" layer="21"/>
-<wire x1="4.95" y1="6" x2="4.95" y2="-1.6" width="0.25" layer="21"/>
-<wire x1="4.95" y1="-1.6" x2="4.5" y2="-1.6" width="0.25" layer="21"/>
-<wire x1="4.5" y1="-1.6" x2="4.5" y2="0" width="0.25" layer="21"/>
-<wire x1="4.5" y1="0" x2="4" y2="0" width="0.25" layer="21"/>
-<pad name="1" x="-3" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
-<pad name="2" x="-1" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
-<pad name="3" x="1" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
-<pad name="4" x="3" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
-<text x="0" y="-2" size="0.8128" layer="25" font="vector" ratio="12" align="top-center">&gt;NAME</text>
-<text x="-3.1" y="-0.9" size="0.7" layer="21" font="vector" ratio="12" align="top-center">GND</text>
-<text x="-1" y="-0.9" size="0.7" layer="21" font="vector" ratio="12" align="top-center">VCC</text>
-<text x="1.1" y="-0.9" size="0.7" layer="21" font="vector" ratio="12" align="top-center">SDA</text>
-<text x="3.2" y="-0.9" size="0.7" layer="21" font="vector" ratio="12" align="top-center">SCL</text>
 </package>
 <package name="1X04-PTH-VERT-I2C-CENTERED">
 <pad name="GND" x="-3.81" y="0" drill="0.9" diameter="1.6" shape="octagon" rot="R90"/>
@@ -3738,16 +3703,27 @@ Yageo CFR series &lt;a href="http://www.yageo.com/pdf/yageo/Leaded-R_CFR_2008.pd
 <wire x1="1.143" y1="0" x2="1.6" y2="0" width="0.1524" layer="21"/>
 </package>
 <package name="APDS-9250-ALT">
+<circle x="-1.5" y="1.25" radius="0.14141875" width="0" layer="21"/>
+<wire x1="-1" y1="1.1" x2="-1" y2="-1.1" width="0.1524" layer="51"/>
+<wire x1="1" y1="1.1" x2="1" y2="-1.1" width="0.1524" layer="51"/>
+<wire x1="-1" y1="1.1" x2="1" y2="1.1" width="0.1524" layer="51"/>
+<wire x1="-1" y1="-1.1" x2="1" y2="-1.1" width="0.1524" layer="51"/>
+<wire x1="-1" y1="1.1" x2="1" y2="1.1" width="0.1524" layer="21"/>
+<wire x1="-1" y1="-1.1" x2="1" y2="-1.1" width="0.1524" layer="21"/>
+<rectangle x1="-1.85" y1="-0.25" x2="-0.2" y2="0.25" layer="29"/>
+<rectangle x1="-1.85" y1="0.45" x2="-0.2" y2="0.95" layer="29"/>
+<rectangle x1="-1.85" y1="-0.95" x2="-0.2" y2="-0.45" layer="29"/>
+<rectangle x1="0.2" y1="0.45" x2="1.85" y2="0.95" layer="29"/>
+<rectangle x1="0.2" y1="-0.25" x2="1.85" y2="0.25" layer="29"/>
+<rectangle x1="0.2" y1="-0.95" x2="1.85" y2="-0.45" layer="29"/>
 <smd name="1" x="-1" y="0.7" dx="1.5" dy="0.4" layer="1" stop="no" cream="no"/>
 <smd name="2" x="-1" y="0" dx="1.5" dy="0.4" layer="1" stop="no" cream="no"/>
 <smd name="3" x="-1" y="-0.7" dx="1.5" dy="0.4" layer="1" stop="no" cream="no"/>
 <smd name="4" x="1" y="-0.7" dx="1.5" dy="0.4" layer="1" stop="no" cream="no"/>
 <smd name="5" x="1" y="0" dx="1.5" dy="0.4" layer="1" stop="no" cream="no"/>
 <smd name="6" x="1" y="0.7" dx="1.5" dy="0.4" layer="1" stop="no" cream="no"/>
-<wire x1="-1" y1="1.1" x2="-1" y2="-1.1" width="0.1524" layer="51"/>
-<wire x1="1" y1="1.1" x2="1" y2="-1.1" width="0.1524" layer="51"/>
-<wire x1="-1" y1="1.1" x2="1" y2="1.1" width="0.1524" layer="51"/>
-<wire x1="-1" y1="-1.1" x2="1" y2="-1.1" width="0.1524" layer="51"/>
+<text x="0" y="1.3" size="0.8" layer="25" font="vector" ratio="10" align="bottom-center">&gt;NAME</text>
+<text x="0" y="-1.3" size="0.6096" layer="27" font="vector" ratio="10" align="top-center">&gt;VALUE</text>
 <polygon width="0" layer="49">
 <vertex x="0.4" y="-0.5" curve="180"/>
 <vertex x="0.4" y="-0.8"/>
@@ -3785,17 +3761,44 @@ Yageo CFR series &lt;a href="http://www.yageo.com/pdf/yageo/Leaded-R_CFR_2008.pd
 <vertex x="-1" y="-0.5"/>
 <vertex x="-1" y="-0.8"/>
 </polygon>
-<wire x1="-1" y1="1.1" x2="1" y2="1.1" width="0.1524" layer="21"/>
-<wire x1="-1" y1="-1.1" x2="1" y2="-1.1" width="0.1524" layer="21"/>
-<circle x="-1.5" y="1.25" radius="0.14141875" width="0" layer="21"/>
-<text x="0" y="1.3" size="0.8" layer="25" font="vector" ratio="10" align="bottom-center">&gt;NAME</text>
-<text x="0" y="-1.3" size="0.6096" layer="27" font="vector" ratio="10" align="top-center">&gt;VALUE</text>
-<rectangle x1="-1.85" y1="-0.25" x2="-0.2" y2="0.25" layer="29"/>
-<rectangle x1="-1.85" y1="0.45" x2="-0.2" y2="0.95" layer="29"/>
-<rectangle x1="-1.85" y1="-0.95" x2="-0.2" y2="-0.45" layer="29"/>
-<rectangle x1="0.2" y1="0.45" x2="1.85" y2="0.95" layer="29"/>
-<rectangle x1="0.2" y1="-0.25" x2="1.85" y2="0.25" layer="29"/>
-<rectangle x1="0.2" y1="-0.95" x2="1.85" y2="-0.45" layer="29"/>
+</package>
+<package name="C1210">
+<description>&lt;b&gt;CAPACITOR&lt;/b&gt;</description>
+<wire x1="-2.42" y1="1.42" x2="2.42" y2="1.42" width="0.1524" layer="39"/>
+<wire x1="2.42" y1="-1.42" x2="-2.42" y2="-1.42" width="0.1524" layer="39"/>
+<wire x1="-2.42" y1="-1.42" x2="-2.42" y2="1.42" width="0.1524" layer="39"/>
+<wire x1="2.42" y1="1.42" x2="2.42" y2="-1.42" width="0.1524" layer="39"/>
+<smd name="1" x="-1.4" y="0" dx="1.6" dy="2.7" layer="1"/>
+<smd name="2" x="1.4" y="0" dx="1.6" dy="2.7" layer="1"/>
+<text x="-2.54" y="0" size="0.8" layer="25" font="vector" ratio="10" rot="R90" align="bottom-center">&gt;NAME</text>
+<text x="2.54" y="0" size="0.7" layer="27" font="vector" ratio="10" rot="R90" align="top-center">&gt;VALUE</text>
+<wire x1="-2.4" y1="-1.6" x2="-2.4" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="-2.4" y1="1.6" x2="2.4" y2="1.6" width="0.1524" layer="21"/>
+<wire x1="2.4" y1="1.6" x2="2.4" y2="-1.6" width="0.1524" layer="21"/>
+<wire x1="2.4" y1="-1.6" x2="-2.4" y2="-1.6" width="0.1524" layer="21"/>
+</package>
+<package name="1X04-JST-PH-RA-PTH-I2C-CENTERED">
+<wire x1="-4.5" y1="0.25" x2="-4.5" y2="-1.35" width="0.1524" layer="21"/>
+<wire x1="-4.5" y1="-1.35" x2="-4.95" y2="-1.35" width="0.1524" layer="21"/>
+<wire x1="-4.95" y1="-1.35" x2="-4.95" y2="6.25" width="0.1524" layer="21"/>
+<wire x1="-4.95" y1="6.25" x2="4.95" y2="6.25" width="0.1524" layer="21"/>
+<wire x1="4.95" y1="6.25" x2="4.95" y2="-1.35" width="0.1524" layer="21"/>
+<wire x1="4.95" y1="-1.35" x2="4.5" y2="-1.35" width="0.1524" layer="21"/>
+<wire x1="4.5" y1="-1.35" x2="4.5" y2="0.25" width="0.1524" layer="21"/>
+<pad name="1" x="-3" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
+<pad name="2" x="-1" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
+<pad name="3" x="1" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
+<pad name="4" x="3" y="0" drill="0.9" diameter="1.4224" shape="octagon"/>
+<text x="0" y="-2" size="0.8" layer="25" font="vector" ratio="10" align="top-center">&gt;NAME</text>
+<text x="-3.1" y="-0.9" size="0.7" layer="21" font="vector" ratio="10" align="top-center">GND</text>
+<text x="-1" y="-0.9" size="0.7" layer="21" font="vector" ratio="10" align="top-center">VCC</text>
+<text x="1.1" y="-0.9" size="0.7" layer="21" font="vector" ratio="10" align="top-center">SDA</text>
+<text x="3.2" y="-0.9" size="0.7" layer="21" font="vector" ratio="10" align="top-center">SCL</text>
+<wire x1="-0.1" y1="0.25" x2="0.1" y2="0.25" width="0.1524" layer="21"/>
+<wire x1="-2.1" y1="0.25" x2="-1.9" y2="0.25" width="0.1524" layer="21"/>
+<wire x1="1.9" y1="0.25" x2="2.1" y2="0.25" width="0.1524" layer="21"/>
+<wire x1="-4.5" y1="0.25" x2="-3.9" y2="0.25" width="0.1524" layer="21"/>
+<wire x1="3.9" y1="0.25" x2="4.5" y2="0.25" width="0.1524" layer="21"/>
 </package>
 </packages>
 <symbols>
