@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="mil" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="mil"/>
+<grid distance="100" unitdist="mil" unit="mil" style="lines" multiple="1" display="yes" altdistance="2" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
@@ -4689,7 +4689,7 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <attribute name="VERSION" value="v1.3"/>
 </part>
 <part name="FEATHERWING" library="a_parts" deviceset="ADAFRUIT_FEATHER_SHIELD" device="SMALLHOLES_NS" value="ADAFRUIT_FEATHER_SHIELDSMALLHOLES_NS"/>
-<part name="U1" library="a_parts" deviceset="GPS_FGPMMOPA6H" device=""/>
+<part name="GPS" library="a_parts" deviceset="GPS_FGPMMOPA6H" device=""/>
 <part name="SUPPLY2" library="a_parts" deviceset="3.3V" device=""/>
 <part name="GND1" library="a_parts" deviceset="GND" device=""/>
 <part name="GND3" library="a_parts" deviceset="GND" device=""/>
@@ -4704,8 +4704,11 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <part name="GND8" library="a_parts" deviceset="GND" device=""/>
 <part name="SUPPLY8" library="a_parts" deviceset="3.3V" device=""/>
 <part name="GND9" library="a_parts" deviceset="GND" device=""/>
-<part name="I2C" library="a_parts" deviceset="M04-I2C" device="JST-4-PH-RA-CENTERED"/>
+<part name="I2C" library="a_parts" deviceset="M04-I2C" device="PTH-0.1IN-CENTERED" value="M04-I2CPTH-0.1IN-CENTERED"/>
 <part name="DISP/MICROSD" library="a_parts" deviceset="M10" device="JST-10-PH-RA-PTH"/>
+<part name="C3" library="a_parts" deviceset="CAPACITOR-CERAMIC" device="C1210" value="10uF"/>
+<part name="SUPPLY1" library="a_parts" deviceset="3.3V" device=""/>
+<part name="GND2" library="a_parts" deviceset="GND" device=""/>
 </parts>
 <sheets>
 <sheet>
@@ -4716,11 +4719,11 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
 <instance part="FRAME1" gate="V" x="152.4" y="0"/>
 <instance part="FEATHERWING" gate="G$1" x="83.82" y="154.94"/>
-<instance part="U1" gate="G$1" x="162.56" y="139.7"/>
+<instance part="GPS" gate="G$1" x="162.56" y="139.7"/>
 <instance part="SUPPLY2" gate="G$1" x="38.1" y="165.1"/>
 <instance part="GND1" gate="1" x="38.1" y="149.86"/>
-<instance part="GND3" gate="1" x="60.96" y="142.24"/>
-<instance part="SUPPLY3" gate="G$1" x="60.96" y="154.94"/>
+<instance part="GND3" gate="1" x="50.8" y="142.24"/>
+<instance part="SUPPLY3" gate="G$1" x="53.34" y="154.94"/>
 <instance part="GND6" gate="1" x="132.08" y="109.22"/>
 <instance part="SUPPLY5" gate="G$1" x="144.78" y="152.4"/>
 <instance part="C1" gate="G$1" x="7.62" y="129.54"/>
@@ -4733,6 +4736,9 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <instance part="GND9" gate="1" x="81.28" y="58.42"/>
 <instance part="I2C" gate="G$1" x="22.86" y="160.02" rot="MR0"/>
 <instance part="DISP/MICROSD" gate="G$1" x="48.26" y="60.96" rot="MR180"/>
+<instance part="C3" gate="G$1" x="17.78" y="129.54"/>
+<instance part="SUPPLY1" gate="G$1" x="17.78" y="139.7"/>
+<instance part="GND2" gate="1" x="17.78" y="116.84"/>
 </instances>
 <busses>
 </busses>
@@ -4746,24 +4752,24 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 </segment>
 <segment>
 <pinref part="GND3" gate="1" pin="GND"/>
-<wire x1="60.96" y1="144.78" x2="60.96" y2="147.32" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="144.78" x2="50.8" y2="147.32" width="0.1524" layer="91"/>
 <pinref part="FEATHERWING" gate="G$1" pin="GND"/>
-<wire x1="60.96" y1="147.32" x2="68.58" y2="147.32" width="0.1524" layer="91"/>
+<wire x1="50.8" y1="147.32" x2="68.58" y2="147.32" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="U1" gate="G$1" pin="GND@2"/>
+<pinref part="GPS" gate="G$1" pin="GND@2"/>
 <wire x1="147.32" y1="132.08" x2="132.08" y2="132.08" width="0.1524" layer="91"/>
 <pinref part="GND6" gate="1" pin="GND"/>
 <wire x1="132.08" y1="132.08" x2="132.08" y2="114.3" width="0.1524" layer="91"/>
-<pinref part="U1" gate="G$1" pin="GND@1"/>
+<pinref part="GPS" gate="G$1" pin="GND@1"/>
 <wire x1="132.08" y1="114.3" x2="132.08" y2="111.76" width="0.1524" layer="91"/>
 <wire x1="147.32" y1="144.78" x2="132.08" y2="144.78" width="0.1524" layer="91"/>
 <wire x1="132.08" y1="144.78" x2="132.08" y2="132.08" width="0.1524" layer="91"/>
 <junction x="132.08" y="132.08"/>
-<pinref part="U1" gate="G$1" pin="GND@3"/>
+<pinref part="GPS" gate="G$1" pin="GND@3"/>
 <wire x1="177.8" y1="129.54" x2="193.04" y2="129.54" width="0.1524" layer="91"/>
 <wire x1="193.04" y1="129.54" x2="193.04" y2="114.3" width="0.1524" layer="91"/>
-<pinref part="U1" gate="G$1" pin="GND@4"/>
+<pinref part="GPS" gate="G$1" pin="GND@4"/>
 <wire x1="177.8" y1="147.32" x2="193.04" y2="147.32" width="0.1524" layer="91"/>
 <wire x1="193.04" y1="147.32" x2="193.04" y2="129.54" width="0.1524" layer="91"/>
 <junction x="193.04" y="129.54"/>
@@ -4784,6 +4790,12 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <wire x1="58.42" y1="63.5" x2="81.28" y2="63.5" width="0.1524" layer="91"/>
 <pinref part="GND9" gate="1" pin="GND"/>
 <wire x1="81.28" y1="63.5" x2="81.28" y2="60.96" width="0.1524" layer="91"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="10"/>
+</segment>
+<segment>
+<pinref part="C3" gate="G$1" pin="2"/>
+<pinref part="GND2" gate="1" pin="GND"/>
+<wire x1="17.78" y1="124.46" x2="17.78" y2="119.38" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="3.3V" class="0">
@@ -4795,14 +4807,14 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 </segment>
 <segment>
 <pinref part="SUPPLY3" gate="G$1" pin="3.3V"/>
-<wire x1="60.96" y1="154.94" x2="60.96" y2="152.4" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="154.94" x2="53.34" y2="152.4" width="0.1524" layer="91"/>
 <pinref part="FEATHERWING" gate="G$1" pin="3V"/>
-<wire x1="60.96" y1="152.4" x2="68.58" y2="152.4" width="0.1524" layer="91"/>
+<wire x1="53.34" y1="152.4" x2="68.58" y2="152.4" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="SUPPLY5" gate="G$1" pin="3.3V"/>
 <wire x1="144.78" y1="152.4" x2="144.78" y2="149.86" width="0.1524" layer="91"/>
-<pinref part="U1" gate="G$1" pin="VCC"/>
+<pinref part="GPS" gate="G$1" pin="VCC"/>
 <wire x1="144.78" y1="149.86" x2="147.32" y2="149.86" width="0.1524" layer="91"/>
 </segment>
 <segment>
@@ -4819,6 +4831,12 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <wire x1="58.42" y1="66.04" x2="81.28" y2="66.04" width="0.1524" layer="91"/>
 <pinref part="SUPPLY8" gate="G$1" pin="3.3V"/>
 <wire x1="81.28" y1="66.04" x2="81.28" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="9"/>
+</segment>
+<segment>
+<pinref part="C3" gate="G$1" pin="1"/>
+<pinref part="SUPPLY1" gate="G$1" pin="3.3V"/>
+<wire x1="17.78" y1="134.62" x2="17.78" y2="139.7" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="SDA" class="0">
@@ -4854,6 +4872,7 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <segment>
 <wire x1="60.96" y1="83.82" x2="58.42" y2="83.82" width="0.1524" layer="91"/>
 <label x="60.96" y="83.82" size="1.27" layer="95" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="2"/>
 </segment>
 </net>
 <net name="MOSI" class="0">
@@ -4865,6 +4884,7 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <segment>
 <wire x1="60.96" y1="86.36" x2="58.42" y2="86.36" width="0.1524" layer="91"/>
 <label x="60.96" y="86.36" size="1.27" layer="95" rot="MR180" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="1"/>
 </segment>
 </net>
 <net name="MISO" class="0">
@@ -4876,83 +4896,91 @@ Standard 10-pin 0.1" header. Use with straight break away headers (SKU : PRT-001
 <segment>
 <wire x1="60.96" y1="71.12" x2="58.42" y2="71.12" width="0.1524" layer="91"/>
 <label x="60.96" y="71.12" size="1.27" layer="95" rot="MR180" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="7"/>
 </segment>
 </net>
 <net name="SD_SW" class="0">
 <segment>
-<wire x1="66.04" y1="137.16" x2="68.58" y2="137.16" width="0.1524" layer="91"/>
-<label x="66.04" y="137.16" size="1.27" layer="95" rot="R180" xref="yes"/>
-<pinref part="FEATHERWING" gate="G$1" pin="A3"/>
-</segment>
-<segment>
 <wire x1="60.96" y1="68.58" x2="58.42" y2="68.58" width="0.1524" layer="91"/>
 <label x="60.96" y="68.58" size="1.27" layer="95" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="8"/>
 </segment>
-</net>
-<net name="DISP_CS" class="0">
-<segment>
-<wire x1="101.6" y1="142.24" x2="99.06" y2="142.24" width="0.1524" layer="91"/>
-<label x="101.6" y="142.24" size="1.27" layer="95" rot="MR180" xref="yes"/>
-<pinref part="FEATHERWING" gate="G$1" pin="11"/>
-</segment>
-<segment>
-<wire x1="60.96" y1="76.2" x2="58.42" y2="76.2" width="0.1524" layer="91"/>
-<label x="60.96" y="76.2" size="1.27" layer="95" rot="MR180" xref="yes"/>
-</segment>
-</net>
-<net name="DISP_DC" class="0">
-<segment>
-<wire x1="101.6" y1="139.7" x2="99.06" y2="139.7" width="0.1524" layer="91"/>
-<label x="101.6" y="139.7" size="1.27" layer="95" rot="MR180" xref="yes"/>
-<pinref part="FEATHERWING" gate="G$1" pin="10"/>
-</segment>
-<segment>
-<wire x1="60.96" y1="81.28" x2="58.42" y2="81.28" width="0.1524" layer="91"/>
-<label x="60.96" y="81.28" size="1.27" layer="95" rot="MR180" xref="yes"/>
-</segment>
-</net>
-<net name="SD_CS" class="0">
-<segment>
-<wire x1="66.04" y1="134.62" x2="68.58" y2="134.62" width="0.1524" layer="91"/>
-<label x="66.04" y="134.62" size="1.27" layer="95" rot="R180" xref="yes"/>
-<pinref part="FEATHERWING" gate="G$1" pin="A4"/>
-</segment>
-<segment>
-<wire x1="60.96" y1="73.66" x2="58.42" y2="73.66" width="0.1524" layer="91"/>
-<label x="60.96" y="73.66" size="1.27" layer="95" xref="yes"/>
-</segment>
-</net>
-<net name="DISP_RST" class="0">
 <segment>
 <wire x1="66.04" y1="132.08" x2="68.58" y2="132.08" width="0.1524" layer="91"/>
 <label x="66.04" y="132.08" size="1.27" layer="95" rot="R180" xref="yes"/>
 <pinref part="FEATHERWING" gate="G$1" pin="A5"/>
 </segment>
+</net>
+<net name="DISP_CS" class="0">
+<segment>
+<wire x1="60.96" y1="76.2" x2="58.42" y2="76.2" width="0.1524" layer="91"/>
+<label x="60.96" y="76.2" size="1.27" layer="95" rot="MR180" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="5"/>
+</segment>
+<segment>
+<wire x1="66.04" y1="137.16" x2="68.58" y2="137.16" width="0.1524" layer="91"/>
+<label x="66.04" y="137.16" size="1.27" layer="95" rot="MR0" xref="yes"/>
+<pinref part="FEATHERWING" gate="G$1" pin="A3"/>
+</segment>
+</net>
+<net name="DISP_DC" class="0">
+<segment>
+<wire x1="60.96" y1="81.28" x2="58.42" y2="81.28" width="0.1524" layer="91"/>
+<label x="60.96" y="81.28" size="1.27" layer="95" rot="MR180" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="3"/>
+</segment>
+<segment>
+<wire x1="66.04" y1="142.24" x2="68.58" y2="142.24" width="0.1524" layer="91"/>
+<label x="66.04" y="142.24" size="1.27" layer="95" rot="MR0" xref="yes"/>
+<pinref part="FEATHERWING" gate="G$1" pin="A1"/>
+</segment>
+</net>
+<net name="SD_CS" class="0">
+<segment>
+<wire x1="60.96" y1="73.66" x2="58.42" y2="73.66" width="0.1524" layer="91"/>
+<label x="60.96" y="73.66" size="1.27" layer="95" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="6"/>
+</segment>
+<segment>
+<wire x1="66.04" y1="134.62" x2="68.58" y2="134.62" width="0.1524" layer="91"/>
+<label x="66.04" y="134.62" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="FEATHERWING" gate="G$1" pin="A4"/>
+</segment>
+</net>
+<net name="DISP_RST" class="0">
 <segment>
 <wire x1="60.96" y1="78.74" x2="58.42" y2="78.74" width="0.1524" layer="91"/>
 <label x="60.96" y="78.74" size="1.27" layer="95" xref="yes"/>
+<pinref part="DISP/MICROSD" gate="G$1" pin="4"/>
+</segment>
+<segment>
+<wire x1="66.04" y1="139.7" x2="68.58" y2="139.7" width="0.1524" layer="91"/>
+<label x="66.04" y="139.7" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="FEATHERWING" gate="G$1" pin="A2"/>
 </segment>
 </net>
 <net name="GPS_TX" class="0">
 <segment>
-<pinref part="U1" gate="G$1" pin="TX"/>
+<pinref part="GPS" gate="G$1" pin="TX"/>
 <wire x1="144.78" y1="129.54" x2="147.32" y2="129.54" width="0.1524" layer="91"/>
 <label x="144.78" y="129.54" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<wire x1="104.14" y1="144.78" x2="101.6" y2="144.78" width="0.1524" layer="91"/>
-<label x="104.14" y="144.78" size="1.27" layer="95" xref="yes"/>
+<wire x1="101.6" y1="147.32" x2="99.06" y2="147.32" width="0.1524" layer="91"/>
+<label x="101.6" y="147.32" size="1.27" layer="95" xref="yes"/>
+<pinref part="FEATHERWING" gate="G$1" pin="13"/>
 </segment>
 </net>
 <net name="GPS_RX" class="0">
 <segment>
-<pinref part="U1" gate="G$1" pin="RX"/>
+<pinref part="GPS" gate="G$1" pin="RX"/>
 <wire x1="144.78" y1="127" x2="147.32" y2="127" width="0.1524" layer="91"/>
 <label x="144.78" y="127" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 <segment>
-<wire x1="104.14" y1="147.32" x2="101.6" y2="147.32" width="0.1524" layer="91"/>
-<label x="104.14" y="147.32" size="1.27" layer="95" xref="yes"/>
+<wire x1="101.6" y1="144.78" x2="99.06" y2="144.78" width="0.1524" layer="91"/>
+<label x="101.6" y="144.78" size="1.27" layer="95" xref="yes"/>
+<pinref part="FEATHERWING" gate="G$1" pin="12"/>
 </segment>
 </net>
 </nets>
