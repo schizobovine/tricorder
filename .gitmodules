@@ -1,21 +1,3 @@
-[submodule "firmware/v2/lib/Arduino-Makefile"]
-	path = firmware/v2/lib/Arduino-Makefile
-	url = git@github.com:sudar/Arduino-Makefile.git
-[submodule "firmware/v2/lib/Adafruit_GFX"]
-	path = firmware/v2/lib/Adafruit_GFX
-	url = git@github.com:adafruit/Adafruit-GFX-Library.git
-[submodule "firmware/v2/lib/Adafruit_SSD1351"]
-	path = firmware/v2/lib/Adafruit_SSD1351
-	url = git@github.com:schizobovine/Adafruit_SSD1351.git
-[submodule "firmware/v2/lib/Adafruit_BMP280"]
-	path = firmware/v2/lib/Adafruit_BMP280
-	url = git@github.com:schizobovine/Adafruit_BMP280.git
-[submodule "firmware/v2/lib/Adafruit_BluefruitLE_nRF51"]
-	path = firmware/v2/lib/Adafruit_BluefruitLE_nRF51
-	url = git@github.com:schizobovine/Adafruit_BluefruitLE_nRF51.git
-[submodule "firmware/v2/lib/Adafruit_MLX90614"]
-	path = firmware/v2/lib/Adafruit_MLX90614
-	url = git@github.com:schizobovine/Adafruit_MLX90614.git
 [submodule "firmware/v1/lib/Arduino-Makefile"]
 	path = firmware/v1/lib/Arduino-Makefile
 	url = git@github.com:sudar/Arduino-Makefile.git
