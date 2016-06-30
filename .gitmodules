@@ -1,0 +1,51 @@
+[submodule "firmware/v2/lib/Arduino-Makefile"]
+	path = firmware/v2/lib/Arduino-Makefile
+	url = git@github.com:sudar/Arduino-Makefile.git
+[submodule "firmware/v2/lib/Adafruit_GFX"]
+	path = firmware/v2/lib/Adafruit_GFX
+	url = git@github.com:adafruit/Adafruit-GFX-Library.git
+[submodule "firmware/v2/lib/Adafruit_SSD1351"]
+	path = firmware/v2/lib/Adafruit_SSD1351
+	url = git@github.com:schizobovine/Adafruit_SSD1351.git
+[submodule "firmware/v2/lib/Adafruit_BMP280"]
+	path = firmware/v2/lib/Adafruit_BMP280
+	url = git@github.com:schizobovine/Adafruit_BMP280.git
+[submodule "firmware/v2/lib/Adafruit_BluefruitLE_nRF51"]
+	path = firmware/v2/lib/Adafruit_BluefruitLE_nRF51
+	url = git@github.com:schizobovine/Adafruit_BluefruitLE_nRF51.git
+[submodule "firmware/v2/lib/Adafruit_MLX90614"]
+	path = firmware/v2/lib/Adafruit_MLX90614
+	url = git@github.com:schizobovine/Adafruit_MLX90614.git
+[submodule "firmware/v1/lib/Arduino-Makefile"]
+	path = firmware/v1/lib/Arduino-Makefile
+	url = git@github.com:sudar/Arduino-Makefile.git
+[submodule "firmware/v1/lib/Adafruit_GFX"]
+	path = firmware/v1/lib/Adafruit_GFX
+	url = git@github.com:adafruit/Adafruit-GFX-Library.git
+[submodule "firmware/v1/lib/Adafruit_SSD1306"]
+	path = firmware/v1/lib/Adafruit_SSD1306
+	url = git@github.com:schizobovine/Adafruit_SSD1306.git
+[submodule "firmware/v1/lib/Adafruit_BMP280"]
+	path = firmware/v1/lib/Adafruit_BMP280
+	url = git@github.com:schizobovine/Adafruit_BMP280.git
+[submodule "firmware/v1/lib/Adafruit_TSL2591"]
+	path = firmware/v1/lib/Adafruit_TSL2591
+	url = git@github.com:schizobovine/Adafruit_TSL2591.git
+[submodule "firmware/v1/lib/Adafruit_LSM9DS0"]
+	path = firmware/v1/lib/Adafruit_LSM9DS0
+	url = git@github.com:schizobovine/Adafruit_LSM9DS0.git
+[submodule "firmware/v1/lib/Adafruit_TSL2561"]
+	path = firmware/v1/lib/Adafruit_TSL2561
+	url = git@github.com:schizobovine/Adafruit_TSL2561.git
+[submodule "firmware/v1/lib/Adafruit_HTU21DF"]
+	path = firmware/v1/lib/Adafruit_HTU21DF
+	url = git@github.com:schizobovine/Adafruit_HTU21DF.git
+[submodule "firmware/v1/lib/Adafruit_MLX90614"]
+	path = firmware/v1/lib/Adafruit_MLX90614
+	url = git@github.com:schizobovine/Adafruit_MLX90614.git
+[submodule "firmware/v1/lib/Adafruit_TCS34725"]
+	path = firmware/v1/lib/Adafruit_TCS34725
+	url = git@github.com:schizobovine/Adafruit_TCS34725.git
+[submodule "firmware/v1/lib/Adafruit_BluefruitLE_nRF51"]
+	path = firmware/v1/lib/Adafruit_BluefruitLE_nRF51
+	url = git@github.com:schizobovine/Adafruit_BluefruitLE_nRF51.git
