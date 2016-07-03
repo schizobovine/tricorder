@@ -29,8 +29,9 @@
 
 #include <Adafruit_MLX90614.h>
 #include <Adafruit_BMP280.h>
-//#include <ClosedCube_HDC1080.h>
+#include <ClosedCube_HDC1080.h>
 #include <VEML6075.h>
+//#include <APDS9250.h>
 
 #define DISP_DC      (15)
 #define DISP_RST     (16)
