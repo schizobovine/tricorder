@@ -10,12 +10,15 @@
  *
  */
 
-//#include <stdlib.h>
 //#include <stdio.h>
 //#include <string.h>
 //#include <math.h>
 //#include <avr/io.h>
 //#include <avr/pgmspace.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
 
 #include <Arduino.h>
 #include <SPI.h>
@@ -23,53 +26,64 @@
 #include <SD.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1351.h>
-
 #include <Adafruit_BLE.h>
 #include <Adafruit_BluefruitLE_SPI.h>
-
+#include <RTClib.h>
+#include <DS3231.h>
 #include <Adafruit_MLX90614.h>
 #include <Adafruit_BMP280.h>
 #include <ClosedCube_HDC1080.h>
 #include <VEML6075.h>
 //#include <APDS9250.h>
 
+// Pin config
 #define DISP_DC      (15)
 #define DISP_RST     (16)
 #define DISP_CS      (17)
 #define SD_CS        (18)
 #define SD_CARDSW    (19)
-#define SD_FILENAME  (F("tricorder.log"))
-
 #define BATT_DIV     (9)
-
 #define BLE_CS       (8)
 #define BLE_IRQ      (7)
 #define BLE_RST      (4)
-#define BLE_VERBOSE  (false)
 
-//
+// Misc
+#define BLE_VERBOSE  (false)
+#define BLE_DUMP_INTERVAL_MS (1000)
+#define WHATS_MY_NAME (F("Tricorder Mk 2.0"))
+#define SD_FILENAME (F("tricorder.log"))
+
+// UV index levels from the US EPA
+#define UVI_LOW      (2.0)
+#define UVI_MODERATE (5.0)
+#define UVI_HIGH     (7.0)
+#define UVI_VERYHIGH (10.0)
+
 // 16-bit color is weird: 5 bits for R & B, but 6 for G? I guess humans are
 // more sensitive to it...
-//
 
 #define COLOR_RED   (0xF800) // 0b1111100000000000 (5)
 #define COLOR_GREEN (0x07E0) // 0b0000011111100000 (6)
 #define COLOR_BLUE  (0x001F) // 0b0000000000011111 (5)
 
-//
 // Composite colors
-//
 
-#define COLOR_BLACK   (0x0000) // 0b0000000000000000 (  0%,   0%,   0%)
-#define COLOR_MAGENTA (0xF81F) // 0b1111100000011111 (100%,   0%, 100%)
-#define COLOR_ORANGE  (0xFD20) // 0b1111110100100000 (100%,  64%,   0%)
-#define COLOR_YELLOW  (0xFFE0) // 0b1111111111100000 (100%, 100%,   0%)
-#define COLOR_CYAN    (0x07FF) // 0b0000011111111111 (  0%, 100%, 100%)
-#define COLOR_PURPLE  (0xA11E) // 0b1010000100011110 ( 62%,  12%,  94%)
-#define COLOR_WHITE   (0xFFFF) // 0b1111111111111111 (100%, 100%, 100%)
+#define COLOR_BLACK    (0x0000) // 0b0000000000000000 (  0%,   0%,   0%)
+#define COLOR_MAGENTA  (0xF81F) // 0b1111100000011111 (100%,   0%, 100%)
+#define COLOR_ORANGE   (0xFD20) // 0b1111110100100000 (100%,  64%,   0%)
+#define COLOR_YELLOW   (0xFFE0) // 0b1111111111100000 (100%, 100%,   0%)
+#define COLOR_CYAN     (0x07FF) // 0b0000011111111111 (  0%, 100%, 100%)
+#define COLOR_PURPLE   (0xA11E) // 0b1010000100011110 ( 62%,  12%,  94%)
+#define COLOR_WHITE    (0xFFFF) // 0b1111111111111111 (100%, 100%, 100%)
+#define COLOR_UV_INDEX (uv_index_color(curr.uvi))
+
+// "Special" characters
+#define STR_DEGREE  "\370"
+#define STR_SQUARED "\375"
 
 // Bluetooth LE modem
 Adafruit_BluefruitLE_SPI modem(BLE_CS, BLE_IRQ, BLE_RST);
+uint32_t ble_last_dump = 0;
 
 // MicroSD card log file
 File logfile;
@@ -78,10 +92,98 @@ bool card_present = false;
 // Display controller
 Adafruit_SSD1351 display(DISP_CS, DISP_DC, DISP_RST);
 
+// RTC
+RTC_DS3231 rtc = RTC_DS3231();
+
 // Sensors
 VEML6075           veml6075  = VEML6075();
 Adafruit_BMP280    bmp280    = Adafruit_BMP280();
 Adafruit_MLX90614  mlx90614  = Adafruit_MLX90614();
+
+// Sensor values, current and last different value. The later is used to forego
+// screen updates (which are unfortunately slow) if the value has not changed.
+
+typedef struct sensval {
+  float ir = 0.0;
+  float vis = 0.0;
+  float uva = 0.0;
+  float uvb = 0.0;
+  float uvi = 0.0;
+  float temp = 0.0;
+  float rh = 0.0;
+  float color_temp = 0.0;
+  float batt_v = 0.0;
+  float press = 0.0;
+  float alt = 0.0;
+  float irtemp = 0.0;
+  float color_r = 0.0;
+  float color_g = 0.0;
+  float color_b = 0.0;
+} sensval_t;
+
+sensval_t curr, last;
+
+// Sensor labels, stored in flash, with same names as sensor values to do some
+// macro trickery to reduce all the code repetition to get both labels and
+// values displayed.
+
+//const char LABEL_ir[]         PROGMEM  = "  IR";
+//const char LABEL_vis[]        PROGMEM  = " Vis";
+//const char LABEL_uva[]        PROGMEM  = " UVA";
+//const char LABEL_uvb[]        PROGMEM  = " UVB";
+//const char LABEL_uvi[]        PROGMEM  = " UVI";
+//const char LABEL_temp[]       PROGMEM  = "Temp";
+//const char LABEL_rh[]         PROGMEM  = " RH%";
+//const char LABEL_color_r[]    PROGMEM  = " Red";
+//const char LABEL_color_g[]    PROGMEM  = "Gren";
+//const char LABEL_color_b[]    PROGMEM  = "Blue";
+//const char LABEL_color_temp[] PROGMEM  = "  CT";
+//const char LABEL_batt_v[]     PROGMEM  = "Batt";
+//const char LABEL_press[]      PROGMEM  = "Pres";
+//const char LABEL_alt[]        PROGMEM  = " Alt";
+//const char LABEL_irtemp[]     PROGMEM  = "Thrm";
+
+// Sensor units, displayed after the data
+
+//const char UNIT_ir[]          PROGMEM  = "";
+//const char UNIT_vis[]         PROGMEM  = "lux";
+//const char UNIT_uva[]         PROGMEM  = "W/m" STR_SQUARED;
+//const char UNIT_uvb[]         PROGMEM  = "W/m" STR_SQUARED;
+//const char UNIT_uvi[]         PROGMEM  = "";
+//const char UNIT_temp[]        PROGMEM  = STR_DEGREE "C";
+//const char UNIT_rh[]          PROGMEM  = "%";
+//const char UNIT_color_r[]     PROGMEM  = "";
+//const char UNIT_color_g[]     PROGMEM  = "";
+//const char UNIT_color_b[]     PROGMEM  = "";
+//const char UNIT_color_temp[]  PROGMEM  = "K";
+//const char UNIT_batt_v[]      PROGMEM  = "V";
+//const char UNIT_press[]       PROGMEM  = "kPa";
+//const char UNIT_alt[]         PROGMEM  = "m";
+//const char UNIT_irtemp[]      PROGMEM  = STR_DEGREE "C";
+
+//
+// Helper macros
+//
+
+#define USEC_DIFF(x, y) \
+  (((x) > (y)) ? ((x) - (y)) : ((x) + (ULONG_MAX - (y))))
+
+#define DISPLAY_LABEL(color, x, y, val) \
+  do { \
+    display.setTextColor(color); \
+    display.setCursor(x, y); \
+    display.print(val); \
+  } while (0)
+
+#define DISPLAY_READING(color, x, y, prec, name) \
+  do { \
+    if (last.name != curr.name) { \
+      last.name = curr.name; \
+      display.setTextColor((color)); \
+      display.setCursor((x), (y)); \
+      display.print(curr.name, prec); \
+    } \
+  } while (0);
 
 ////////////////////////////////////////////////////////////////////////
 // HALPING
@@ -90,6 +192,61 @@ Adafruit_MLX90614  mlx90614  = Adafruit_MLX90614();
 float getBattVoltage() {
   float measured = analogRead(BATT_DIV);
   return measured * 2.0 * 3.3 / 1024;
+}
+
+uint16_t uv_index_color(float uv_index) {
+  if (uv_index <= UVI_LOW) {
+    return COLOR_GREEN;
+  } else if (uv_index <= UVI_MODERATE) {
+    return COLOR_YELLOW;
+  } else if (uv_index <= UVI_HIGH) {
+    return COLOR_ORANGE;
+  } else if (uv_index <= UVI_VERYHIGH) {
+    return COLOR_RED;
+  } else { // UVI XTREEEEEEEME
+    return COLOR_PURPLE;
+  }
+}
+
+bool isBLEDumpTime() {
+  uint32_t now = millis();
+  if (USEC_DIFF(now, ble_last_dump) >= BLE_DUMP_INTERVAL_MS) {
+    ble_last_dump = now;
+    return true;
+  }
+  return false;
+}
+
+void displayLabels() {
+  DISPLAY_LABEL(COLOR_WHITE,  0,  16, F("  IR"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  24, F(" Vis"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  32, F(" UVA"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  40, F(" UVB"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  48, F(" UVI"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  56, F("Temp"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  64, F(" RH%"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  72, F("  CT"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  80, F("Batt"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  88, F("Pres"));
+  DISPLAY_LABEL(COLOR_WHITE,  0,  96, F(" Alt"));
+  DISPLAY_LABEL(COLOR_WHITE,  0, 104, F("Thrm"));
+  DISPLAY_LABEL(COLOR_WHITE, 90, 16,     F("R"));
+  DISPLAY_LABEL(COLOR_WHITE, 90, 24,     F("G"));
+  DISPLAY_LABEL(COLOR_WHITE, 90, 32,     F("B"));
+}
+
+void displayUnits() {
+  DISPLAY_LABEL(COLOR_WHITE, 60,  16, F("W/m" STR_SQUARED));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  24, F("lux"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  32, F("W/m" STR_SQUARED));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  40, F("W/m" STR_SQUARED));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  56, F(STR_DEGREE "C"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  64, F("%"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  72, F("K"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  80, F("V"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  88, F("kPa"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  96, F("m"));
+  DISPLAY_LABEL(COLOR_WHITE, 60, 104, F(STR_DEGREE "C"));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -116,7 +273,9 @@ void setup() {
   display.setCursor(0, 0);
   display.setTextColor(COLOR_ORANGE);
   display.setTextSize(1);
-  display.print("Tricorder Mk 2.0");
+  display.print(WHATS_MY_NAME);
+  displayLabels();
+  displayUnits();
 
   // Check if SD card is present (shorts to ground if not present)
   pinMode(SD_CARDSW, INPUT_PULLUP);
@@ -132,6 +291,9 @@ void setup() {
   // Init i2C
   Wire.begin();
 
+  // Init RTC
+  rtc.begin();
+
   // Init sensors
   veml6075.begin();
   bmp280.begin();
@@ -144,69 +306,68 @@ void setup() {
 ////////////////////////////////////////////////////////////////////////
 
 void loop() {
+
+  //
+  // Poll RTC for time (UTC)
+  //
+  static DateTime ts;
+  static String now;
+  ts = rtc.now();
+  ts.iso8601(now);
   
   //
   // Sensor polling
   //
 
-  uint32_t now = millis();
-
   veml6075.poll();
-  float uva = veml6075.getUVA();
-  float uvb = veml6075.getUVB();
-  float uvi = veml6075.getUVIndex();
+  curr.uva = veml6075.getUVA();
+  curr.uvb = veml6075.getUVB();
+  curr.uvi = veml6075.getUVIndex();
+
+  curr.batt_v = getBattVoltage();
 
   //
   // BLE data output
   //
-  if (modem.isConnected()) {
+  if (modem.isConnected() && isBLEDumpTime()) {
     modem.setMode(BLUEFRUIT_MODE_DATA);
     modem.print(now);
-    modem.print(F(" UVA = "));
-    modem.print(uva);
-    modem.print(F(" UVB = "));
-    modem.print(uvb);
-    modem.print(F(" UV Index = "));
-    modem.println(uvi);
   }
 
   //
   // Display refresh
   //
-  display.quickFill(COLOR_BLACK);
-  display.setTextSize(1);
+  //display.quickFill(COLOR_BLACK);
+  //display.setTextSize(1);
 
-  display.setTextColor(COLOR_ORANGE);
-  display.setCursor(0, 0);
-  display.print("Tricorder Mk 2.0");
+  //display.setTextColor(COLOR_ORANGE);
+  //display.setCursor(0, 0);
+  //display.print(WHATS_MY_NAME);
 
   display.setTextColor(COLOR_WHITE);
   display.setCursor(0, 8);
-  display.print(F("Time ="));
-  display.setCursor(48, 8);
   display.print(now);
 
-  display.setTextColor(COLOR_YELLOW);
-  display.setCursor(0, 16);
-  display.print(F(" UVA ="));
-  display.setCursor(48, 16);
-  display.print(uva);
+  /*********************************************************************/
+  /*              color             x,   y, pre, name      */
+  /*********************************************************************/
+  DISPLAY_READING(COLOR_WHITE,     40,  16,   1, ir);
+  DISPLAY_READING(COLOR_WHITE,     40,  24,   1, vis);
+  DISPLAY_READING(COLOR_WHITE,     40,  32,   1, uva);
+  DISPLAY_READING(COLOR_WHITE,     40,  40,   1, uvb);
+  DISPLAY_READING(COLOR_UV_INDEX,  40,  48,   1, uvi);
+  DISPLAY_READING(COLOR_WHITE,     40,  56,   1, temp);
+  DISPLAY_READING(COLOR_WHITE,     40,  60,   0, rh);
+  DISPLAY_READING(COLOR_WHITE,     40,  72,   0, color_temp);
+  DISPLAY_READING(COLOR_WHITE,     40,  80,   2, batt_v);
+  DISPLAY_READING(COLOR_WHITE,     40,  88,   1, press);
+  DISPLAY_READING(COLOR_WHITE,     40,  96,   0, alt);
+  DISPLAY_READING(COLOR_WHITE,     40, 104,   2, irtemp);
+  DISPLAY_READING(COLOR_RED,       98,  16,   0, color_r);
+  DISPLAY_READING(COLOR_GREEN,     98,  24,   0, color_g);
+  DISPLAY_READING(COLOR_BLUE,      98,  32,   0, color_b);
 
-  display.setTextColor(COLOR_RED);
-  display.setCursor(0, 24);
-  display.print(F(" UVB ="));
-  display.setCursor(48, 24);
-  display.print(uvb);
-
-  display.setTextColor(COLOR_PURPLE);
-  display.setCursor(0, 32);
-  display.print(F(" UVI ="));
-  display.setCursor(48, 32);
-  display.print(uvi);
-
-  //
   // Delay between data polls
-  //
-  delay(1000);
+  //delay(1000);
 
 }
