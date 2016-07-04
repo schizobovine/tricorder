@@ -47,6 +47,8 @@
 #define BLE_IRQ      (7)
 #define BLE_RST      (4)
 
+#define I2C_ADDR_HDC1080 0x40
+
 // Misc
 #define BLE_VERBOSE  (false)
 #define BLE_DUMP_INTERVAL_MS (1000)
@@ -69,17 +71,19 @@
 // Composite colors
 
 #define COLOR_BLACK    (0x0000) // 0b0000000000000000 (  0%,   0%,   0%)
+#define COLOR_BROWN    (0xA145) // 0b1010000101000101 ( 64%,  16%,  16%)
 #define COLOR_MAGENTA  (0xF81F) // 0b1111100000011111 (100%,   0%, 100%)
 #define COLOR_ORANGE   (0xFD20) // 0b1111110100100000 (100%,  64%,   0%)
 #define COLOR_YELLOW   (0xFFE0) // 0b1111111111100000 (100%, 100%,   0%)
 #define COLOR_CYAN     (0x07FF) // 0b0000011111111111 (  0%, 100%, 100%)
 #define COLOR_PURPLE   (0xA11E) // 0b1010000100011110 ( 62%,  12%,  94%)
+#define COLOR_LAVENDER (0XE73F) // 0b1110011100111111 ( 90%,  90%,  98%)
 #define COLOR_WHITE    (0xFFFF) // 0b1111111111111111 (100%, 100%, 100%)
 #define COLOR_UV_INDEX (uv_index_color(curr.uvi))
 
 // "Special" characters
-#define STR_DEGREE  "\370"
-#define STR_SQUARED "\375"
+#define STR_DEGREE  "\367"
+#define STR_SQUARED "\374"
 
 // Bluetooth LE modem
 Adafruit_BluefruitLE_SPI modem(BLE_CS, BLE_IRQ, BLE_RST);
@@ -99,67 +103,30 @@ RTC_DS3231 rtc = RTC_DS3231();
 VEML6075           veml6075  = VEML6075();
 Adafruit_BMP280    bmp280    = Adafruit_BMP280();
 Adafruit_MLX90614  mlx90614  = Adafruit_MLX90614();
+ClosedCube_HDC1080 hdc1080   = ClosedCube_HDC1080();
 
 // Sensor values, current and last different value. The later is used to forego
 // screen updates (which are unfortunately slow) if the value has not changed.
 
 typedef struct sensval {
-  float ir = 0.0;
-  float vis = 0.0;
-  float uva = 0.0;
-  float uvb = 0.0;
-  float uvi = 0.0;
-  float temp = 0.0;
-  float rh = 0.0;
-  float color_temp = 0.0;
-  float batt_v = 0.0;
-  float press = 0.0;
-  float alt = 0.0;
-  float irtemp = 0.0;
-  float color_r = 0.0;
-  float color_g = 0.0;
-  float color_b = 0.0;
+  float ir = -1.0;
+  float vis = -1.0;
+  float uva = -1.0;
+  float uvb = -1.0;
+  float uvi = -1.0;
+  float temp = -1.0;
+  float rh = -1.0;
+  float color_temp = -1.0;
+  float batt_v = -1.0;
+  float press = -1.0;
+  float alt = -1.0;
+  float irtemp = -1.0;
+  float color_r = -1.0;
+  float color_g = -1.0;
+  float color_b = -1.0;
 } sensval_t;
 
 sensval_t curr, last;
-
-// Sensor labels, stored in flash, with same names as sensor values to do some
-// macro trickery to reduce all the code repetition to get both labels and
-// values displayed.
-
-//const char LABEL_ir[]         PROGMEM  = "  IR";
-//const char LABEL_vis[]        PROGMEM  = " Vis";
-//const char LABEL_uva[]        PROGMEM  = " UVA";
-//const char LABEL_uvb[]        PROGMEM  = " UVB";
-//const char LABEL_uvi[]        PROGMEM  = " UVI";
-//const char LABEL_temp[]       PROGMEM  = "Temp";
-//const char LABEL_rh[]         PROGMEM  = " RH%";
-//const char LABEL_color_r[]    PROGMEM  = " Red";
-//const char LABEL_color_g[]    PROGMEM  = "Gren";
-//const char LABEL_color_b[]    PROGMEM  = "Blue";
-//const char LABEL_color_temp[] PROGMEM  = "  CT";
-//const char LABEL_batt_v[]     PROGMEM  = "Batt";
-//const char LABEL_press[]      PROGMEM  = "Pres";
-//const char LABEL_alt[]        PROGMEM  = " Alt";
-//const char LABEL_irtemp[]     PROGMEM  = "Thrm";
-
-// Sensor units, displayed after the data
-
-//const char UNIT_ir[]          PROGMEM  = "";
-//const char UNIT_vis[]         PROGMEM  = "lux";
-//const char UNIT_uva[]         PROGMEM  = "W/m" STR_SQUARED;
-//const char UNIT_uvb[]         PROGMEM  = "W/m" STR_SQUARED;
-//const char UNIT_uvi[]         PROGMEM  = "";
-//const char UNIT_temp[]        PROGMEM  = STR_DEGREE "C";
-//const char UNIT_rh[]          PROGMEM  = "%";
-//const char UNIT_color_r[]     PROGMEM  = "";
-//const char UNIT_color_g[]     PROGMEM  = "";
-//const char UNIT_color_b[]     PROGMEM  = "";
-//const char UNIT_color_temp[]  PROGMEM  = "K";
-//const char UNIT_batt_v[]      PROGMEM  = "V";
-//const char UNIT_press[]       PROGMEM  = "kPa";
-//const char UNIT_alt[]         PROGMEM  = "m";
-//const char UNIT_irtemp[]      PROGMEM  = STR_DEGREE "C";
 
 //
 // Helper macros
@@ -179,7 +146,7 @@ sensval_t curr, last;
   do { \
     if (last.name != curr.name) { \
       last.name = curr.name; \
-      display.setTextColor((color)); \
+      display.setTextColor((color), COLOR_BLACK); \
       display.setCursor((x), (y)); \
       display.print(curr.name, prec); \
     } \
@@ -218,21 +185,21 @@ bool isBLEDumpTime() {
 }
 
 void displayLabels() {
-  DISPLAY_LABEL(COLOR_WHITE,  0,  16, F("  IR"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  24, F(" Vis"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  32, F(" UVA"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  40, F(" UVB"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  48, F(" UVI"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  56, F("Temp"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  64, F(" RH%"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  72, F("  CT"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  80, F("Batt"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  88, F("Pres"));
-  DISPLAY_LABEL(COLOR_WHITE,  0,  96, F(" Alt"));
-  DISPLAY_LABEL(COLOR_WHITE,  0, 104, F("Thrm"));
-  DISPLAY_LABEL(COLOR_WHITE, 90, 16,     F("R"));
-  DISPLAY_LABEL(COLOR_WHITE, 90, 24,     F("G"));
-  DISPLAY_LABEL(COLOR_WHITE, 90, 32,     F("B"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  16, F("  IR"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  24, F(" Vis"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  32, F(" UVA"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  40, F(" UVB"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  48, F(" UVI"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  56, F("Temp"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  64, F(" RH%"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  72, F("  CT"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  80, F("Batt"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  88, F("Pres"));
+  DISPLAY_LABEL(COLOR_WHITE,     0,  96, F(" Alt"));
+  DISPLAY_LABEL(COLOR_WHITE,     0, 104, F("Thrm"));
+  DISPLAY_LABEL(COLOR_WHITE,    90, 16,     F("R"));
+  DISPLAY_LABEL(COLOR_WHITE,    90, 24,     F("G"));
+  DISPLAY_LABEL(COLOR_WHITE,    90, 32,     F("B"));
 }
 
 void displayUnits() {
@@ -298,6 +265,7 @@ void setup() {
   veml6075.begin();
   bmp280.begin();
   mlx90614.begin(); 
+  hdc1080.begin(I2C_ADDR_HDC1080);
 
 }
 
@@ -323,8 +291,19 @@ void loop() {
   curr.uva = veml6075.getUVA();
   curr.uvb = veml6075.getUVB();
   curr.uvi = veml6075.getUVIndex();
-
+  curr.temp = hdc1080.readTemperature();
+  curr.rh = hdc1080.readHumidity();
+  curr.press = bmp280.readPressure();
+  curr.alt = bmp280.readAltitude();
+  curr.irtemp = mlx90614.readObjectTempC();
   curr.batt_v = getBattVoltage();
+
+  curr.ir = 0.0;
+  curr.vis = 0.0;
+  curr.color_r = 0.0;
+  curr.color_g = 0.0;
+  curr.color_b = 0.0;
+  curr.color_temp = 0.0;
 
   //
   // BLE data output
@@ -337,37 +316,31 @@ void loop() {
   //
   // Display refresh
   //
-  //display.quickFill(COLOR_BLACK);
-  //display.setTextSize(1);
 
-  //display.setTextColor(COLOR_ORANGE);
-  //display.setCursor(0, 0);
-  //display.print(WHATS_MY_NAME);
-
-  display.setTextColor(COLOR_WHITE);
+  display.setTextColor(COLOR_WHITE, COLOR_BLACK);
   display.setCursor(0, 8);
   display.print(now);
 
   /*********************************************************************/
   /*              color             x,   y, pre, name      */
   /*********************************************************************/
-  DISPLAY_READING(COLOR_WHITE,     40,  16,   1, ir);
-  DISPLAY_READING(COLOR_WHITE,     40,  24,   1, vis);
-  DISPLAY_READING(COLOR_WHITE,     40,  32,   1, uva);
-  DISPLAY_READING(COLOR_WHITE,     40,  40,   1, uvb);
-  DISPLAY_READING(COLOR_UV_INDEX,  40,  48,   1, uvi);
-  DISPLAY_READING(COLOR_WHITE,     40,  56,   1, temp);
-  DISPLAY_READING(COLOR_WHITE,     40,  60,   0, rh);
-  DISPLAY_READING(COLOR_WHITE,     40,  72,   0, color_temp);
-  DISPLAY_READING(COLOR_WHITE,     40,  80,   2, batt_v);
-  DISPLAY_READING(COLOR_WHITE,     40,  88,   1, press);
-  DISPLAY_READING(COLOR_WHITE,     40,  96,   0, alt);
-  DISPLAY_READING(COLOR_WHITE,     40, 104,   2, irtemp);
+  DISPLAY_READING(COLOR_BROWN,     26,  16,   1, ir);
+  DISPLAY_READING(COLOR_GREEN,     26,  24,   1, vis);
+  DISPLAY_READING(COLOR_PURPLE,    26,  32,   1, uva);
+  DISPLAY_READING(COLOR_PURPLE,    26,  40,   1, uvb);
+  DISPLAY_READING(COLOR_UV_INDEX,  26,  48,   1, uvi);
+  DISPLAY_READING(COLOR_WHITE,     26,  56,   1, temp);
+  DISPLAY_READING(COLOR_CYAN,      26,  64,   0, rh);
+  DISPLAY_READING(COLOR_WHITE,     26,  72,   0, color_temp);
+  DISPLAY_READING(COLOR_WHITE,     26,  80,   2, batt_v);
+  DISPLAY_READING(COLOR_WHITE,     26,  88,   1, press);
+  DISPLAY_READING(COLOR_WHITE,     26,  96,   0, alt);
+  DISPLAY_READING(COLOR_WHITE,     26, 104,   2, irtemp);
   DISPLAY_READING(COLOR_RED,       98,  16,   0, color_r);
   DISPLAY_READING(COLOR_GREEN,     98,  24,   0, color_g);
   DISPLAY_READING(COLOR_BLUE,      98,  32,   0, color_b);
 
   // Delay between data polls
-  //delay(1000);
+  delay(100);
 
 }
