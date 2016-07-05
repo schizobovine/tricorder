@@ -237,7 +237,7 @@ void setup() {
   delay(100);
   display.begin();
   display.quickFill(COLOR_BLACK);
-  display.setCursor(0, 0);
+  display.setCursor(16, 0);
   display.setTextColor(COLOR_ORANGE);
   display.setTextSize(1);
   display.print(WHATS_MY_NAME);
