@@ -185,35 +185,41 @@ bool isBLEDumpTime() {
 }
 
 void displayLabels() {
-  DISPLAY_LABEL(COLOR_WHITE,     0,  16, F("  IR"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  24, F(" Vis"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  32, F(" UVA"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  40, F(" UVB"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  48, F(" UVI"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  56, F("Temp"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  64, F(" RH%"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  72, F("  CT"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  80, F("Batt"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  88, F("Pres"));
-  DISPLAY_LABEL(COLOR_WHITE,     0,  96, F(" Alt"));
-  DISPLAY_LABEL(COLOR_WHITE,     0, 104, F("Thrm"));
-  DISPLAY_LABEL(COLOR_WHITE,    90, 16,     F("R"));
-  DISPLAY_LABEL(COLOR_WHITE,    90, 24,     F("G"));
-  DISPLAY_LABEL(COLOR_WHITE,    90, 32,     F("B"));
+  DISPLAY_LABEL(COLOR_BROWN,      0,  16, F("  IR"));
+  //DISPLAY_LABEL(COLOR_GREEN,     0,  24, F(" Vis"));
+  DISPLAY_LABEL(COLOR_PURPLE,     0,  24, F(" UVA"));
+  DISPLAY_LABEL(COLOR_PURPLE,     0,  32, F(" UVB"));
+  DISPLAY_LABEL(COLOR_PURPLE,     0,  40, F(" UVI"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("Temperature"));
+  //DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("Fa"));
+  //DISPLAY_LABEL(COLOR_WHITE,      0,  56, F(" Amb"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  64, F(" RH%"));
+  //DISPLAY_LABEL(COLOR_WHITE,     0,  72, F("  CT"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  80, F("Batt"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  88, F("Pres"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  96, F(" Alt"));
+  DISPLAY_LABEL(COLOR_WHITE,      0, 104, F("Thrm"));
+
+  DISPLAY_LABEL(COLOR_WHITE,     70,  16, F("Visible"));
+  DISPLAY_LABEL(COLOR_WHITE,     70,  24, F("R"));
+  DISPLAY_LABEL(COLOR_WHITE,     70,  32, F("G"));
+  DISPLAY_LABEL(COLOR_WHITE,     70,  40, F("B"));
+  //DISPLAY_LABEL(COLOR_WHITE,    70,  48, F("  CT"));
+  //DISPLAY_LABEL(COLOR_WHITE,    70,  56, F(" Vis"));
 }
 
 void displayUnits() {
-  DISPLAY_LABEL(COLOR_WHITE, 60,  16, F("W/m" STR_SQUARED));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  24, F("lux"));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  32, F("W/m" STR_SQUARED));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  40, F("W/m" STR_SQUARED));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  56, F(STR_DEGREE "C"));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  64, F("%"));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  16, F("W/m" STR_SQUARED));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  24, F("lux"));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  32, F("W/m" STR_SQUARED));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  40, F("W/m" STR_SQUARED));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  48, F(STR_DEGREE "C IR"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  56, F(STR_DEGREE "C Amb"));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  64, F("%"));
   DISPLAY_LABEL(COLOR_WHITE, 60,  72, F("K"));
   DISPLAY_LABEL(COLOR_WHITE, 60,  80, F("V"));
   DISPLAY_LABEL(COLOR_WHITE, 60,  88, F("kPa"));
   DISPLAY_LABEL(COLOR_WHITE, 60,  96, F("m"));
-  DISPLAY_LABEL(COLOR_WHITE, 60, 104, F(STR_DEGREE "C"));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,21 +330,25 @@ void loop() {
   /*********************************************************************/
   /*              color             x,   y, pre, name      */
   /*********************************************************************/
-  DISPLAY_READING(COLOR_BROWN,     26,  16,   1, ir);
-  DISPLAY_READING(COLOR_GREEN,     26,  24,   1, vis);
-  DISPLAY_READING(COLOR_PURPLE,    26,  32,   1, uva);
-  DISPLAY_READING(COLOR_PURPLE,    26,  40,   1, uvb);
-  DISPLAY_READING(COLOR_UV_INDEX,  26,  48,   1, uvi);
+  DISPLAY_READING(COLOR_WHITE,     26,  16,   1, ir);
+  DISPLAY_READING(COLOR_WHITE,     26,  24,   1, uva);
+  DISPLAY_READING(COLOR_WHITE,     26,  32,   1, uvb);
+  DISPLAY_READING(COLOR_WHITE,     26,  40,   1, uvi);
+
   DISPLAY_READING(COLOR_WHITE,     26,  56,   1, temp);
-  DISPLAY_READING(COLOR_CYAN,      26,  64,   0, rh);
-  DISPLAY_READING(COLOR_WHITE,     26,  72,   0, color_temp);
-  DISPLAY_READING(COLOR_WHITE,     26,  80,   2, batt_v);
-  DISPLAY_READING(COLOR_WHITE,     26,  88,   1, press);
-  DISPLAY_READING(COLOR_WHITE,     26,  96,   0, alt);
-  DISPLAY_READING(COLOR_WHITE,     26, 104,   2, irtemp);
-  DISPLAY_READING(COLOR_RED,       98,  16,   0, color_r);
-  DISPLAY_READING(COLOR_GREEN,     98,  24,   0, color_g);
-  DISPLAY_READING(COLOR_BLUE,      98,  32,   0, color_b);
+  DISPLAY_READING(COLOR_WHITE,     26,  64,   2, irtemp);
+
+  DISPLAY_READING(COLOR_CYAN,      26,  72,   1, rh);
+  DISPLAY_READING(COLOR_WHITE,     26,  80,   1, press);
+  DISPLAY_READING(COLOR_WHITE,     26,  88,   0, alt);
+
+  DISPLAY_READING(COLOR_WHITE,     26,  96,   2, batt_v);
+
+  DISPLAY_READING(COLOR_RED,       78,  16,   0, color_r);
+  DISPLAY_READING(COLOR_GREEN,     78,  24,   0, color_g);
+  DISPLAY_READING(COLOR_BLUE,      78,  32,   0, color_b);
+  DISPLAY_READING(COLOR_WHITE,     78,  40,   1, vis);
+  DISPLAY_READING(COLOR_WHITE,     78,  48,   0, color_temp);
 
   // Delay between data polls
   delay(100);
