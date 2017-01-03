@@ -17,7 +17,6 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1351.h>
 #include <Adafruit_MLX90614.h>
-#include <Adafruit_BMP280.h>
 #include <ClosedCube_HDC1080.h>
 #include <VEML6075.h>
 
@@ -74,7 +73,6 @@ Adafruit_SSD1351 display(DISP_CS, DISP_DC, DISP_RST);
 
 // Sensors
 VEML6075           veml6075  = VEML6075();
-Adafruit_BMP280    bmp280    = Adafruit_BMP280();
 Adafruit_MLX90614  mlx90614  = Adafruit_MLX90614();
 ClosedCube_HDC1080 hdc1080   = ClosedCube_HDC1080();
 
@@ -88,12 +86,14 @@ typedef struct sensval {
   float uvb = -1.0;
   float uvi = -1.0;
   float temp = -1.0;
+  float temp_f = -1.0;
   float rh = -1.0;
   float color_temp = -1.0;
   float batt_v = -1.0;
   float press = -1.0;
   float alt = -1.0;
   float irtemp = -1.0;
+  float irtemp_f = -1.0;
   float color_r = -1.0;
   float color_g = -1.0;
   float color_b = -1.0;
@@ -118,12 +118,17 @@ sensval_t curr, last;
 #define DISPLAY_READING(color, x, y, prec, name) \
   do { \
     if (last.name != curr.name) { \
+      display.setTextColor(COLOR_BLACK); \
+      display.setCursor((x), (y)); \
+      display.print(last.name, prec); \
       last.name = curr.name; \
       display.setTextColor((color), COLOR_BLACK); \
       display.setCursor((x), (y)); \
       display.print(curr.name, prec); \
     } \
   } while (0);
+
+#define C_TO_F(x) ((x) * 9.0/5.0 + 32.0)
 
 ////////////////////////////////////////////////////////////////////////
 // HALPING
@@ -149,41 +154,71 @@ uint16_t uv_index_color(float uv_index) {
 }
 
 void displayLabels() {
-  DISPLAY_LABEL(COLOR_BROWN,      0,  16, F("  IR"));
-  //DISPLAY_LABEL(COLOR_GREEN,     0,  24, F(" Vis"));
-  DISPLAY_LABEL(COLOR_PURPLE,     0,  24, F(" UVA"));
-  DISPLAY_LABEL(COLOR_PURPLE,     0,  32, F(" UVB"));
-  DISPLAY_LABEL(COLOR_PURPLE,     0,  40, F(" UVI"));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("Temperature"));
-  //DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("Fa"));
-  //DISPLAY_LABEL(COLOR_WHITE,      0,  56, F(" Amb"));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  64, F(" RH%"));
-  //DISPLAY_LABEL(COLOR_WHITE,     0,  72, F("  CT"));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  80, F("Batt"));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  88, F("Pres"));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  96, F(" Alt"));
-  DISPLAY_LABEL(COLOR_WHITE,      0, 104, F("Thrm"));
-
-  DISPLAY_LABEL(COLOR_WHITE,     70,  16, F("Visible"));
-  DISPLAY_LABEL(COLOR_WHITE,     70,  24, F("R"));
-  DISPLAY_LABEL(COLOR_WHITE,     70,  32, F("G"));
-  DISPLAY_LABEL(COLOR_WHITE,     70,  40, F("B"));
-  //DISPLAY_LABEL(COLOR_WHITE,    70,  48, F("  CT"));
-  //DISPLAY_LABEL(COLOR_WHITE,    70,  56, F(" Vis"));
+  /*******************************************************************************/
+  /*           |color          |  x|   y| label                                  */
+  /*******************************************************************************/
+  DISPLAY_LABEL(COLOR_WHITE,      0,   0, F("Tricorder  Batt     V"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,   8, F("   Tamb  Trem   R    "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  16, F(STR_DEGREE "C              G    "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  24, F(STR_DEGREE "F              B    "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  32, F("IR         UVA       "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  40, F("Vis        UVB       "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("lux        UVI       "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  56, F("Prel        kPa RH   "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  64, F("Pabs        kPa    % "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  72, F("    acc   mag  gyro  "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  80, F("x                    "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  88, F("y                    "));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  96, F("z                    "));
+  DISPLAY_LABEL(COLOR_WHITE,      0, 104, F("lat         " STR_DEGREE "     alt"));
+  DISPLAY_LABEL(COLOR_WHITE,      0, 112, F("lon         " STR_DEGREE "       m"));
 }
 
-void displayUnits() {
-  //DISPLAY_LABEL(COLOR_WHITE, 60,  16, F("W/m" STR_SQUARED));
-  //DISPLAY_LABEL(COLOR_WHITE, 60,  24, F("lux"));
-  //DISPLAY_LABEL(COLOR_WHITE, 60,  32, F("W/m" STR_SQUARED));
-  //DISPLAY_LABEL(COLOR_WHITE, 60,  40, F("W/m" STR_SQUARED));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  48, F(STR_DEGREE "C IR"));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  56, F(STR_DEGREE "C Amb"));
-  //DISPLAY_LABEL(COLOR_WHITE, 60,  64, F("%"));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  72, F("K"));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  80, F("V"));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  88, F("kPa"));
-  DISPLAY_LABEL(COLOR_WHITE, 60,  96, F("m"));
+
+void displayValues_veml6075() {
+}
+
+void displayValues_mlx90614() {
+  // color, x, y, precision, value
+  DISPLAY_READING(COLOR_WHITE, 54, 16, 1, irtemp);
+  DISPLAY_READING(COLOR_WHITE, 54, 24, 1, irtemp_f);
+}
+
+void displayValues_hdc1080() {
+  // color, x, y, precision, value
+  DISPLAY_READING(COLOR_WHITE, 18, 16, 1, temp);
+  DISPLAY_READING(COLOR_WHITE, 18, 24, 1, temp_f);
+  DISPLAY_READING(COLOR_WHITE, 96, 64, 0, rh);
+}
+
+void displayValues_lsm9ds0() {
+  /*********************************************************************/
+  /*              color             x,   y, pre, name      */
+  /*********************************************************************/
+  DISPLAY_READING(COLOR_WHITE,     26,  16,   1, ir);
+  DISPLAY_READING(COLOR_WHITE,     26,  24,   1, uva);
+  DISPLAY_READING(COLOR_WHITE,     26,  32,   1, uvb);
+  DISPLAY_READING(COLOR_WHITE,     26,  40,   1, uvi);
+
+  DISPLAY_READING(COLOR_WHITE,     26,  56,   1, temp);
+  DISPLAY_READING(COLOR_WHITE,     26,  64,   2, irtemp);
+
+  DISPLAY_READING(COLOR_CYAN,      26,  72,   1, rh);
+  DISPLAY_READING(COLOR_WHITE,     26,  80,   1, press);
+  DISPLAY_READING(COLOR_WHITE,     26,  88,   0, alt);
+
+  DISPLAY_READING(COLOR_WHITE,     26,  96,   2, batt_v);
+
+  DISPLAY_READING(COLOR_RED,       78,  16,   0, color_r);
+  DISPLAY_READING(COLOR_GREEN,     78,  24,   0, color_g);
+  DISPLAY_READING(COLOR_BLUE,      78,  32,   0, color_b);
+  DISPLAY_READING(COLOR_WHITE,     78,  40,   1, vis);
+  DISPLAY_READING(COLOR_WHITE,     78,  48,   0, color_temp);
+}
+
+void displayValues_batt() {
+  // color, x, y, precision, value
+  DISPLAY_READING(COLOR_WHITE, 96, 0, 2, batt_v);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -202,12 +237,7 @@ void setup() {
   delay(100);
   display.begin();
   display.quickFill(COLOR_BLACK);
-  display.setCursor(16, 0);
-  display.setTextColor(COLOR_ORANGE);
-  display.setTextSize(1);
-  display.print(WHATS_MY_NAME);
   displayLabels();
-  displayUnits();
 
   // Check if SD card is present (shorts to ground if not present)
   pinMode(SD_CARDSW, INPUT_PULLUP);
@@ -225,7 +255,6 @@ void setup() {
 
   // Init sensors
   veml6075.begin();
-  bmp280.begin();
   mlx90614.begin(); 
   hdc1080.begin(I2C_ADDR_HDC1080);
 
@@ -254,10 +283,10 @@ void loop() {
   curr.uvb = veml6075.getUVB();
   curr.uvi = veml6075.getUVIndex();
   curr.temp = hdc1080.readTemperature();
+  curr.temp_f = C_TO_F(curr.temp);
   curr.rh = hdc1080.readHumidity();
-  curr.press = bmp280.readPressure();
-  curr.alt = bmp280.readAltitude();
   curr.irtemp = mlx90614.readObjectTempC();
+  curr.irtemp_f = C_TO_F(curr.irtemp);
   curr.batt_v = getBattVoltage();
 
   curr.ir = 0.0;
@@ -268,35 +297,39 @@ void loop() {
   curr.color_temp = 0.0;
 
   //
-  // Display refresh
+  // Display readings refresh
   //
 
-  display.setTextColor(COLOR_WHITE, COLOR_BLACK);
-  display.setCursor(0, 8);
+  displayValues_veml6075();
+  displayValues_mlx90614();
+  displayValues_hdc1080(); 
+
+  //display.setTextColor(COLOR_WHITE, COLOR_BLACK);
+  //display.setCursor(0, 8);
   //display.print(now);
 
   /*********************************************************************/
   /*              color             x,   y, pre, name      */
   /*********************************************************************/
-  DISPLAY_READING(COLOR_WHITE,     26,  16,   1, ir);
-  DISPLAY_READING(COLOR_WHITE,     26,  24,   1, uva);
-  DISPLAY_READING(COLOR_WHITE,     26,  32,   1, uvb);
-  DISPLAY_READING(COLOR_WHITE,     26,  40,   1, uvi);
+  //DISPLAY_READING(COLOR_WHITE,     26,  16,   1, ir);
+  //DISPLAY_READING(COLOR_WHITE,     26,  24,   1, uva);
+  //DISPLAY_READING(COLOR_WHITE,     26,  32,   1, uvb);
+  //DISPLAY_READING(COLOR_WHITE,     26,  40,   1, uvi);
 
-  DISPLAY_READING(COLOR_WHITE,     26,  56,   1, temp);
-  DISPLAY_READING(COLOR_WHITE,     26,  64,   2, irtemp);
+  //DISPLAY_READING(COLOR_WHITE,     26,  56,   1, temp);
+  //DISPLAY_READING(COLOR_WHITE,     26,  64,   2, irtemp);
 
-  DISPLAY_READING(COLOR_CYAN,      26,  72,   1, rh);
-  DISPLAY_READING(COLOR_WHITE,     26,  80,   1, press);
-  DISPLAY_READING(COLOR_WHITE,     26,  88,   0, alt);
+  //DISPLAY_READING(COLOR_CYAN,      26,  72,   1, rh);
+  //DISPLAY_READING(COLOR_WHITE,     26,  80,   1, press);
+  //DISPLAY_READING(COLOR_WHITE,     26,  88,   0, alt);
 
-  DISPLAY_READING(COLOR_WHITE,     26,  96,   2, batt_v);
+  //DISPLAY_READING(COLOR_WHITE,     26,  96,   2, batt_v);
 
-  DISPLAY_READING(COLOR_RED,       78,  16,   0, color_r);
-  DISPLAY_READING(COLOR_GREEN,     78,  24,   0, color_g);
-  DISPLAY_READING(COLOR_BLUE,      78,  32,   0, color_b);
-  DISPLAY_READING(COLOR_WHITE,     78,  40,   1, vis);
-  DISPLAY_READING(COLOR_WHITE,     78,  48,   0, color_temp);
+  //DISPLAY_READING(COLOR_RED,       78,  16,   0, color_r);
+  //DISPLAY_READING(COLOR_GREEN,     78,  24,   0, color_g);
+  //DISPLAY_READING(COLOR_BLUE,      78,  32,   0, color_b);
+  //DISPLAY_READING(COLOR_WHITE,     78,  40,   1, vis);
+  //DISPLAY_READING(COLOR_WHITE,     78,  48,   0, color_temp);
 
   // Delay between data polls
   delay(100);
