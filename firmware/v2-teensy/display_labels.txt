@@ -1,0 +1,16 @@
+DISPLAY_LABEL(COLOR_WHITE,       0,   0, F("Tricorder  Batt     V"));
+DISPLAY_LABEL(COLOR_WHITE,       0,   8, F("   Tamb  Trem   R    "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  16, F("°C              G    "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  24, F("°F              B    "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  32, F("IR         UVA       "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  40, F("Vis        UVB       "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  48, F("lux        UVI       "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  56, F("Prel        kPa      "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  64, F("Pabs        kPa      "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  72, F("    acc   mag  gyro  "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  80, F("x                    "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  88, F("y                    "));
+DISPLAY_LABEL(COLOR_WHITE,       0,  96, F("z                    "));
+DISPLAY_LABEL(COLOR_WHITE,       0, 104, F("lat         °     alt"));
+DISPLAY_LABEL(COLOR_WHITE,       0, 112, F("lon         °       m"));
+// vi: syntax=c
