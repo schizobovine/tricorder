@@ -28,19 +28,6 @@
 #define SD_CARDSW    (20) //A5
 #define BATT_DIV     (21)
 
-#define I2C_ADDR_HDC1080 0x40
-
-// Misc
-#define WHATS_MY_NAME (F("Tricorder Mk 2.0"))
-#define SD_FILENAME ("tricorder.log")
-#define ANALOG_RES (10)
-
-// UV index levels from the US EPA
-#define UVI_LOW      (2.0)
-#define UVI_MODERATE (5.0)
-#define UVI_HIGH     (7.0)
-#define UVI_VERYHIGH (10.0)
-
 // 16-bit color is weird: 5 bits for R & B, but 6 for G? I guess humans are
 // more sensitive to it...
 
@@ -59,16 +46,19 @@
 #define COLOR_PURPLE   (0xA11E) // 0b1010000100011110 ( 62%,  12%,  94%)
 #define COLOR_LAVENDER (0XE73F) // 0b1110011100111111 ( 90%,  90%,  98%)
 #define COLOR_WHITE    (0xFFFF) // 0b1111111111111111 (100%, 100%, 100%)
-#define COLOR_UV_INDEX (uv_index_color(curr.uvi))
 
 // "Special" characters
 #define STR_DEGREE  "\367"
 #define STR_SQUARED "\374"
 
+// Misc
+#define SD_FILENAME ("tricorder.log")
+#define ANALOG_RES (10)
+#define I2C_ADDR_HDC1080 0x40
+
 // MicroSD card log file
 File logfile;
 bool card_present = false;
-uint8_t analog_res_bits = 10;
 
 // Display controller
 Adafruit_SSD1351 display(DISP_CS, DISP_DC, DISP_RST);
@@ -114,6 +104,7 @@ typedef struct sensval {
   float gyro_x = -1.0;
   float gyro_y = -1.0;
   float gyro_z = -1.0;
+
 } sensval_t;
 
 sensval_t curr, last;
@@ -155,39 +146,25 @@ float getBattVoltage() {
   return measured / ((float)(1 << ANALOG_RES)) * 2.0 * 3.3;
 }
 
-uint16_t uv_index_color(float uv_index) {
-  if (uv_index <= UVI_LOW) {
-    return COLOR_GREEN;
-  } else if (uv_index <= UVI_MODERATE) {
-    return COLOR_YELLOW;
-  } else if (uv_index <= UVI_HIGH) {
-    return COLOR_ORANGE;
-  } else if (uv_index <= UVI_VERYHIGH) {
-    return COLOR_RED;
-  } else { // UVI XTREEEEEEEME
-    return COLOR_PURPLE;
-  }
-}
-
 void displayLabels() {
-  /*******************************************************************************/
-  /*           |color          |  x|   y| label                                  */
-  /*******************************************************************************/
-  DISPLAY_LABEL(COLOR_WHITE,      0,   0, F("Tricorder  Batt     V"));
-  DISPLAY_LABEL(COLOR_WHITE,      0,   8, F("   Tamb  Trem   R    "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  16, F(STR_DEGREE "C              G    "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  24, F(STR_DEGREE "F              B    "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  32, F("IR         UVA       "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  40, F("Vis        UVB       "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("lux        UVI       "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  56, F("Prel        kPa RH   "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  64, F("Pabs        kPa    % "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  72, F("    acc   mag  gyro  "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  80, F("x                    "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  88, F("y                    "));
-  DISPLAY_LABEL(COLOR_WHITE,      0,  96, F("z                    "));
-  DISPLAY_LABEL(COLOR_WHITE,      0, 104, F("lat         " STR_DEGREE "     alt"));
-  DISPLAY_LABEL(COLOR_WHITE,      0, 112, F("lon         " STR_DEGREE "       m"));
+  ////////////////////////////////////////////////////////////////////////////
+  //           |color      | x|   y| label                             
+  ////////////////////////////////////////////////////////////////////////////
+  DISPLAY_LABEL(COLOR_WHITE, 0,   0, F("Tricorder  Batt     V"));
+  DISPLAY_LABEL(COLOR_WHITE, 0,   8, F("   Tamb  Trem   R    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  16, F(STR_DEGREE "C              G    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  24, F(STR_DEGREE "F              B    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  32, F("IR         UVA       "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  40, F("Vis        UVB       "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  48, F("lux        UVI       "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  56, F("Prel        kPa RH   "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  64, F("Pabs        kPa    % "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  72, F("    acc   mag  gyro  "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  80, F("x                    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  88, F("y                    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  96, F("z                    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0, 104, F("lat         " STR_DEGREE "     alt"));
+  DISPLAY_LABEL(COLOR_WHITE, 0, 112, F("lon         " STR_DEGREE "       m"));
 }
 
 void displayValues_veml6075() {
@@ -233,6 +210,11 @@ void displayValues_lsm9ds0() {
   DISPLAY_READING(COLOR_WHITE, 84, 80, 0, 6, gyro_x);
   DISPLAY_READING(COLOR_WHITE, 84, 88, 0, 6, gyro_y);
   DISPLAY_READING(COLOR_WHITE, 84, 96, 0, 6, gyro_z);
+}
+
+void displayValues_gps() {
+  // color, x, y, precision, value
+  DISPLAY_READING(COLOR_WHITE, 96, 0, 2, 4, batt_v);
 }
 
 void displayValues_batt() {
@@ -349,6 +331,7 @@ void loop() {
   displayValues_hdc1080(); 
   displayValues_ms5611();
   displayValues_lsm9ds0();
+  displayValues_gps();
 
   // Delay between data polls
   delay(100);
