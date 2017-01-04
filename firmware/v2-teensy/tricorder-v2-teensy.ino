@@ -15,21 +15,50 @@
 #include <Wire.h>
 #include <SD.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_SSD1351.h>
+#include <ssd1351.h>
 #include <Adafruit_MLX90614.h>
 #include <ClosedCube_HDC1080.h>
 #include <VEML6075.h>
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 // Pin config
+// Ugh. To use the optimized ssd1351 code, the DC and CS pins need to be
+// hardware CS pins on separate masks. Thus my use of the analog pins here
+// won't fly. Damnit.
+
+// Alternate options, from reading SPI.pinIsChipSelect(uint8_t, uint8_t):
+//
+// mask cs1 cs2 cs3
+// 0x01 10  2   26
+// 0x02 9   6
+// 0x04 20  23
+// 0x08 21  22
+// 0x10 15
+// 0x20 45
+
 #define DISP_DC      (15) //A1
 #define DISP_RST     (17) //A2
-#define DISP_CS      (16) //A3
+#define DISP_CS      (10)
 #define SD_CS        (14) //A4
 #define SD_CARDSW    (20) //A5
 #define BATT_DIV     (21)
 
 // 16-bit color is weird: 5 bits for R & B, but 6 for G? I guess humans are
 // more sensitive to it...
+
+// How many bits of color ya want?
+//typedef ssd1351::HighColor Color;    // 18 (6/chan)
+typedef ssd1351::LowColor Color;     // 16 (5/6/5)
+//typedef ssd1351::IndexedColor Color; // 8
+
+// Enable or disable double buffer
+//typedef ssd1351::NoBuffer Buffer;
+typedef ssd1351::SingleBuffer Buffer;
+
+// Define some color consts
 
 #define COLOR_RED   (0xF800) // 0b1111100000000000 (5)
 #define COLOR_GREEN (0x07E0) // 0b0000011111100000 (6)
@@ -61,7 +90,7 @@ File logfile;
 bool card_present = false;
 
 // Display controller
-Adafruit_SSD1351 display(DISP_CS, DISP_DC, DISP_RST);
+auto display = ssd1351::SSD1351<Color,Buffer>(DISP_CS, DISP_DC, DISP_RST);
 
 // Sensors
 VEML6075           veml6075  = VEML6075();
@@ -214,12 +243,12 @@ void displayValues_lsm9ds0() {
 
 void displayValues_gps() {
   // color, x, y, precision, value
-  DISPLAY_READING(COLOR_WHITE, 96, 0, 2, 4, batt_v);
+  //DISPLAY_READING(COLOR_WHITE, 96, 0, 2, 4, batt_v);
 }
 
 void displayValues_batt() {
   // color, x, y, precision, value
-  DISPLAY_READING(COLOR_WHITE, 96, 0, 2, 4, batt_v);
+  //DISPLAY_READING(COLOR_WHITE, 96, 0, 2, 4, batt_v);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -227,6 +256,10 @@ void displayValues_batt() {
 ////////////////////////////////////////////////////////////////////////
 
 void setup() {
+
+  delay(1000);
+  Serial.begin(9600);
+  Serial.println(F("Tricorder v2.0-teensy (Built " __DATE__ " " __TIME__")"));
 
   // Set CS pins as outputs and set all high by default
   pinMode(DISP_CS, OUTPUT);
@@ -240,8 +273,12 @@ void setup() {
   // Init display
   delay(100);
   display.begin();
-  display.quickFill(COLOR_BLACK);
+  //display.setTextSize(1);
+  display.setFont(OGFont);
+  display.fillScreen(COLOR_BLACK);
   displayLabels();
+  display.updateScreen();
+  Serial.println("display init complete");
 
   // Check if SD card is present (shorts to ground if not present)
   pinMode(SD_CARDSW, INPUT_PULLUP);
@@ -253,6 +290,7 @@ void setup() {
       }
     }
   }
+  Serial.println("SD init complete");
 
   // Init i2C
   Wire.begin();
@@ -261,6 +299,7 @@ void setup() {
   veml6075.begin();
   mlx90614.begin(); 
   hdc1080.begin(I2C_ADDR_HDC1080);
+  Serial.println("i2c init complete");
 
 }
 
@@ -282,56 +321,57 @@ void loop() {
   // Sensor polling
   //
 
-  veml6075.poll();
-  curr.uva = veml6075.getUVA();
-  curr.uvb = veml6075.getUVB();
-  curr.uvi = veml6075.getUVIndex();
-  curr.temp = hdc1080.readTemperature();
-  curr.temp_f = C_TO_F(curr.temp);
-  curr.rh = hdc1080.readHumidity();
-  curr.irtemp = mlx90614.readObjectTempC();
-  curr.irtemp_f = C_TO_F(curr.irtemp);
-  curr.batt_v = getBattVoltage();
+  /// veml6075.poll();
+  /// curr.uva = veml6075.getUVA();
+  /// curr.uvb = veml6075.getUVB();
+  /// curr.uvi = veml6075.getUVIndex();
+  /// curr.temp = hdc1080.readTemperature();
+  /// curr.temp_f = C_TO_F(curr.temp);
+  /// curr.rh = hdc1080.readHumidity();
+  /// curr.irtemp = mlx90614.readObjectTempC();
+  /// curr.irtemp_f = C_TO_F(curr.irtemp);
+  /// curr.batt_v = getBattVoltage();
 
-  curr.ir = 0.0;
-  curr.vis = 0.0;
-  curr.color_r = 0.0;
-  curr.color_g = 0.0;
-  curr.color_b = 0.0;
-  curr.color_temp = 0.0;
+  /// curr.ir = 0.0;
+  /// curr.vis = 0.0;
+  /// curr.color_r = 0.0;
+  /// curr.color_g = 0.0;
+  /// curr.color_b = 0.0;
+  /// curr.color_temp = 0.0;
 
-  curr.press_abs = 0.0;
-  curr.press_rel = 0.0;
-  curr.alt = 0.0;
+  /// curr.press_abs = 0.0;
+  /// curr.press_rel = 0.0;
+  /// curr.alt = 0.0;
 
-  curr.acc_x = 0.0;
-  curr.acc_y = 0.0;
-  curr.acc_z = 0.0;
-  curr.mag_x = 0.0;
-  curr.mag_y = 0.0;
-  curr.mag_z = 0.0;
-  curr.gyro_x = 0.0;
-  curr.gyro_y = 0.0;
-  curr.gyro_z = 0.0;
+  /// curr.acc_x = 0.0;
+  /// curr.acc_y = 0.0;
+  /// curr.acc_z = 0.0;
+  /// curr.mag_x = 0.0;
+  /// curr.mag_y = 0.0;
+  /// curr.mag_z = 0.0;
+  /// curr.gyro_x = 0.0;
+  /// curr.gyro_y = 0.0;
+  /// curr.gyro_z = 0.0;
 
-  // DEBUG
-  curr.raw_uva = veml6075.getRawUVA();
-  curr.raw_uvb = veml6075.getRawUVB();
-  curr.raw_dark = veml6075.getRawDark();
-  curr.raw_ir_comp = veml6075.getRawIRComp();
-  curr.raw_vis_comp = veml6075.getRawVisComp();
+  /// // DEBUG
+  /// curr.raw_uva = veml6075.getRawUVA();
+  /// curr.raw_uvb = veml6075.getRawUVB();
+  /// curr.raw_dark = veml6075.getRawDark();
+  /// curr.raw_ir_comp = veml6075.getRawIRComp();
+  /// curr.raw_vis_comp = veml6075.getRawVisComp();
 
-  //
-  // Display readings refresh
-  //
+  /// //
+  /// // Display readings refresh
+  /// //
 
-  displayValues_batt();
-  displayValues_veml6075();
-  displayValues_mlx90614();
-  displayValues_hdc1080(); 
-  displayValues_ms5611();
-  displayValues_lsm9ds0();
-  displayValues_gps();
+  /// displayValues_batt();
+  /// displayValues_veml6075();
+  /// displayValues_mlx90614();
+  /// displayValues_hdc1080(); 
+  /// displayValues_ms5611();
+  /// displayValues_lsm9ds0();
+  /// displayValues_gps();
+  /// display.updateScreen();
 
   // Delay between data polls
   delay(100);
