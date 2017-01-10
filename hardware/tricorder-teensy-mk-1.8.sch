@@ -9967,7 +9967,7 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <parts>
 <part name="FRAME1" library="a_parts" deviceset="FRAME-LETTER" device="NO_PACKAGE">
 <attribute name="DESIGNER" value="sean@yak.net"/>
-<attribute name="VERSION" value="v1.7"/>
+<attribute name="VERSION" value="v1.8"/>
 </part>
 <part name="SUPPLY2" library="a_parts" deviceset="3.3V" device=""/>
 <part name="GND6" library="a_parts" deviceset="GND" device=""/>
@@ -10009,7 +10009,7 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <part name="SUPPLY11" library="a_parts" deviceset="VBAT" device=""/>
 <part name="GND4" library="a_parts" deviceset="GND" device=""/>
 <part name="GND1" library="a_parts" deviceset="GND" device=""/>
-<part name="D2" library="a_parts" deviceset="DIODE-SCHOTTKY" device="SMA"/>
+<part name="D1" library="a_parts" deviceset="DIODE-SCHOTTKY" device="SOD123"/>
 <part name="PWR_SW" library="a_parts" deviceset="M02" device="JST-2MM-SMT"/>
 <part name="GPS_RX_ALT" library="a_parts" deviceset="JUMPER-PAD-3-NO" device="FULL_BOX_SILK"/>
 <part name="GPS_TX_ALT" library="a_parts" deviceset="JUMPER-PAD-3-NO" device="FULL_BOX_SILK"/>
@@ -10039,12 +10039,12 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <instance part="GPS" gate="G$1" x="114.3" y="35.56"/>
 <instance part="TEENSY" gate="G$1" x="167.64" y="142.24"/>
 <instance part="PROG" gate="G$1" x="30.48" y="73.66"/>
-<instance part="SUPPLY4" gate="G$1" x="129.54" y="137.16"/>
+<instance part="SUPPLY4" gate="G$1" x="109.22" y="137.16"/>
 <instance part="BATT" gate="G$1" x="15.24" y="45.72" rot="MR180"/>
 <instance part="GND2" gate="1" x="142.24" y="106.68"/>
 <instance part="SUPPLY10" gate="G$1" x="27.94" y="58.42"/>
-<instance part="GND8" gate="1" x="27.94" y="35.56"/>
-<instance part="SUPPLY13" gate="G$1" x="137.16" y="137.16"/>
+<instance part="GND8" gate="1" x="27.94" y="33.02"/>
+<instance part="SUPPLY13" gate="G$1" x="116.84" y="137.16"/>
 <instance part="U1" gate="A" x="167.64" y="73.66"/>
 <instance part="CHRG" gate="G$1" x="124.46" y="73.66" smashed="yes" rot="R90">
 <attribute name="NAME" x="131.572" y="69.596" size="1.778" layer="95" rot="R180"/>
@@ -10064,8 +10064,8 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <instance part="SUPPLY11" gate="G$1" x="33.02" y="129.54"/>
 <instance part="GND4" gate="1" x="33.02" y="96.52"/>
 <instance part="GND1" gate="1" x="38.1" y="149.86"/>
-<instance part="D2" gate="G$1" x="205.74" y="81.28"/>
-<instance part="PWR_SW" gate="G$1" x="15.24" y="58.42" rot="MR180"/>
+<instance part="D1" gate="G$1" x="205.74" y="81.28"/>
+<instance part="PWR_SW" gate="G$1" x="15.24" y="48.26"/>
 <instance part="GPS_RX_ALT" gate="G$1" x="226.06" y="142.24"/>
 <instance part="GPS_TX_ALT" gate="G$1" x="226.06" y="119.38"/>
 </instances>
@@ -10145,7 +10145,7 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <pinref part="BATT" gate="G$1" pin="2"/>
 <wire x1="25.4" y1="40.64" x2="27.94" y2="40.64" width="0.1524" layer="91"/>
 <pinref part="GND8" gate="1" pin="GND"/>
-<wire x1="27.94" y1="40.64" x2="27.94" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="40.64" x2="27.94" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="3.3V" class="0">
@@ -10184,9 +10184,9 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 </segment>
 <segment>
 <pinref part="SUPPLY4" gate="G$1" pin="3.3V"/>
-<wire x1="129.54" y1="137.16" x2="129.54" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="109.22" y1="137.16" x2="109.22" y2="129.54" width="0.1524" layer="91"/>
 <pinref part="TEENSY" gate="G$1" pin="3.3V"/>
-<wire x1="129.54" y1="129.54" x2="147.32" y2="129.54" width="0.1524" layer="91"/>
+<wire x1="109.22" y1="129.54" x2="147.32" y2="129.54" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="SDA" class="0">
@@ -10375,7 +10375,7 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <wire x1="195.58" y1="81.28" x2="185.42" y2="81.28" width="0.1524" layer="91"/>
 <junction x="195.58" y="81.28"/>
 <wire x1="195.58" y1="81.28" x2="203.2" y2="81.28" width="0.1524" layer="91"/>
-<pinref part="D2" gate="G$1" pin="A"/>
+<pinref part="D1" gate="G$1" pin="A"/>
 </segment>
 <segment>
 <pinref part="R4" gate="G$1" pin="2"/>
@@ -10383,10 +10383,10 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <wire x1="33.02" y1="129.54" x2="33.02" y2="127" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="PWR_SW" gate="G$1" pin="1"/>
-<wire x1="25.4" y1="55.88" x2="27.94" y2="55.88" width="0.1524" layer="91"/>
+<pinref part="PWR_SW" gate="G$1" pin="2"/>
+<wire x1="25.4" y1="53.34" x2="27.94" y2="53.34" width="0.1524" layer="91"/>
 <pinref part="SUPPLY10" gate="G$1" pin="VBAT"/>
-<wire x1="27.94" y1="55.88" x2="27.94" y2="58.42" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="53.34" x2="27.94" y2="58.42" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="VUSB" class="0">
@@ -10402,15 +10402,15 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 </segment>
 <segment>
 <pinref part="SUPPLY13" gate="G$1" pin="VUSB"/>
-<wire x1="137.16" y1="137.16" x2="137.16" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="137.16" x2="116.84" y2="134.62" width="0.1524" layer="91"/>
 <pinref part="TEENSY" gate="G$1" pin="VIN"/>
-<wire x1="137.16" y1="134.62" x2="147.32" y2="134.62" width="0.1524" layer="91"/>
+<wire x1="116.84" y1="134.62" x2="147.32" y2="134.62" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="208.28" y1="81.28" x2="218.44" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="SUPPLY7" gate="G$1" pin="VUSB"/>
 <wire x1="218.44" y1="81.28" x2="218.44" y2="86.36" width="0.1524" layer="91"/>
-<pinref part="D2" gate="G$1" pin="C"/>
+<pinref part="D1" gate="G$1" pin="C"/>
 </segment>
 <segment>
 <pinref part="C3" gate="G$1" pin="1"/>
@@ -10437,9 +10437,9 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <label x="38.1" y="114.3" size="1.27" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="TEENSY" gate="G$1" pin="A6/20*"/>
-<wire x1="144.78" y1="154.94" x2="147.32" y2="154.94" width="0.1524" layer="91"/>
-<label x="144.78" y="154.94" size="1.27" layer="95" rot="R180" xref="yes"/>
+<wire x1="139.7" y1="139.7" x2="147.32" y2="139.7" width="0.1524" layer="91"/>
+<label x="139.7" y="139.7" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="TEENSY" gate="G$1" pin="A14/DAC"/>
 </segment>
 </net>
 <net name="N$1" class="0">
@@ -10454,15 +10454,6 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <pinref part="R6" gate="G$1" pin="1"/>
 <pinref part="CHRG" gate="G$1" pin="C"/>
 <wire x1="129.54" y1="73.66" x2="134.62" y2="73.66" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$5" class="0">
-<segment>
-<pinref part="BATT" gate="G$1" pin="1"/>
-<wire x1="25.4" y1="43.18" x2="27.94" y2="43.18" width="0.1524" layer="91"/>
-<wire x1="27.94" y1="43.18" x2="27.94" y2="53.34" width="0.1524" layer="91"/>
-<pinref part="PWR_SW" gate="G$1" pin="2"/>
-<wire x1="27.94" y1="53.34" x2="25.4" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="7/RX3" class="0">
@@ -10501,6 +10492,15 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <label x="228.6" y="111.76" size="1.27" layer="95" rot="MR180" xref="yes"/>
 <pinref part="GPS_TX_ALT" gate="G$1" pin="3"/>
 <wire x1="226.06" y1="111.76" x2="226.06" y2="114.3" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="PWR_SW" gate="G$1" pin="1"/>
+<wire x1="25.4" y1="50.8" x2="27.94" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="50.8" x2="27.94" y2="43.18" width="0.1524" layer="91"/>
+<pinref part="BATT" gate="G$1" pin="1"/>
+<wire x1="27.94" y1="43.18" x2="25.4" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
