@@ -6436,25 +6436,33 @@ diameter 2 mm, horizontal, grid 7.62 mm</description>
 <rectangle x1="0.8" y1="-0.35" x2="1.7" y2="0.35" layer="29"/>
 </package>
 <package name="MSOP-8">
-<smd name="1" x="-2.2" y="0.975" dx="1.5" dy="0.42" layer="1"/>
-<smd name="2" x="-2.2" y="0.325" dx="1.5" dy="0.42" layer="1"/>
-<smd name="3" x="-2.2" y="-0.325" dx="1.5" dy="0.42" layer="1"/>
-<smd name="4" x="-2.2" y="-0.975" dx="1.5" dy="0.42" layer="1"/>
-<smd name="5" x="2.2" y="-0.975" dx="1.5" dy="0.42" layer="1"/>
-<smd name="6" x="2.2" y="-0.325" dx="1.5" dy="0.42" layer="1"/>
-<smd name="7" x="2.2" y="0.325" dx="1.5" dy="0.42" layer="1"/>
-<smd name="8" x="2.2" y="0.975" dx="1.5" dy="0.42" layer="1"/>
+<smd name="1" x="-2.2" y="0.975" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
+<smd name="2" x="-2.2" y="0.325" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
+<smd name="3" x="-2.2" y="-0.325" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
+<smd name="4" x="-2.2" y="-0.975" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
+<smd name="5" x="2.2" y="-0.975" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
+<smd name="6" x="2.2" y="-0.325" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
+<smd name="7" x="2.2" y="0.325" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
+<smd name="8" x="2.2" y="0.975" dx="1.5" dy="0.42" layer="1" stop="no" cream="no"/>
 <wire x1="1.5" y1="1.5" x2="0.5" y2="1.5" width="0.1524" layer="21"/>
 <wire x1="-0.5" y1="1.5" x2="-1.5" y2="1.5" width="0.1524" layer="21"/>
 <text x="0" y="1.7" size="0.7" layer="25" font="vector" ratio="12" align="bottom-center">&gt;NAME</text>
 <wire x1="-1.5" y1="-1.5" x2="1.5" y2="-1.5" width="0.1524" layer="21"/>
 <wire x1="0.5" y1="1.5" x2="-0.5" y2="1.5" width="0.1524" layer="21" curve="-180"/>
 <text x="0" y="-1.7" size="0.6096" layer="27" font="vector" ratio="12" align="top-center">&gt;VALUE</text>
-<wire x1="-1.5" y1="1.5" x2="-1.5" y2="1.4" width="0.1524" layer="21"/>
-<wire x1="1.5" y1="1.5" x2="1.5" y2="1.4" width="0.1524" layer="21"/>
-<wire x1="1.5" y1="-1.5" x2="1.5" y2="-1.4" width="0.1524" layer="21"/>
-<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="-1.4" width="0.1524" layer="21"/>
-<circle x="-1" y="0.975" radius="0.22" width="0" layer="21"/>
+<wire x1="-1.5" y1="1.5" x2="-1.5" y2="1.35" width="0.1524" layer="21"/>
+<wire x1="1.5" y1="1.5" x2="1.5" y2="1.35" width="0.1524" layer="21"/>
+<wire x1="1.5" y1="-1.5" x2="1.5" y2="-1.35" width="0.1524" layer="21"/>
+<wire x1="-1.5" y1="-1.5" x2="-1.5" y2="-1.35" width="0.1524" layer="21"/>
+<circle x="-1" y="0.975" radius="0.2" width="0" layer="21"/>
+<rectangle x1="-3" y1="0.725" x2="-1.4" y2="1.225" layer="29"/>
+<rectangle x1="-3" y1="-0.575" x2="-1.4" y2="-0.075" layer="29"/>
+<rectangle x1="1.4" y1="0.725" x2="3" y2="1.225" layer="29"/>
+<rectangle x1="1.4" y1="-0.575" x2="3" y2="-0.075" layer="29"/>
+<rectangle x1="1.4" y1="0.075" x2="3" y2="0.575" layer="29"/>
+<rectangle x1="-3" y1="0.075" x2="-1.4" y2="0.575" layer="29"/>
+<rectangle x1="-3" y1="-1.225" x2="-1.4" y2="-0.725" layer="29"/>
+<rectangle x1="1.4" y1="-1.225" x2="3" y2="-0.725" layer="29"/>
 </package>
 </packages>
 <symbols>
@@ -9889,7 +9897,7 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <part name="SUPPLY9" library="a_parts" deviceset="VUSB" device=""/>
 <part name="GND11" library="a_parts" deviceset="GND" device=""/>
 <part name="GND1" library="a_parts" deviceset="GND" device=""/>
-<part name="D1" library="a_parts" deviceset="DIODE-SCHOTTKY" device="SOD123"/>
+<part name="D1" library="a_parts" deviceset="DIODE-SCHOTTKY" device="SOD123" value="MBRS0540"/>
 <part name="PWR_SW" library="a_parts" deviceset="M02" device="JST-2MM-SMT"/>
 <part name="GPS_RX_ALT" library="a_parts" deviceset="JUMPER-PAD-3-NO" device="FULL_BOX_SILK"/>
 <part name="GPS_TX_ALT" library="a_parts" deviceset="JUMPER-PAD-3-NO" device="FULL_BOX_SILK"/>
@@ -9941,12 +9949,12 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <instance part="R3" gate="G$1" x="187.96" y="66.04" rot="R90"/>
 <instance part="SUPPLY15" gate="G$1" x="195.58" y="83.82"/>
 <instance part="C2" gate="G$1" x="195.58" y="73.66"/>
-<instance part="SUPPLY7" gate="G$1" x="218.44" y="83.82"/>
+<instance part="SUPPLY7" gate="G$1" x="220.98" y="83.82"/>
 <instance part="C3" gate="G$1" x="17.78" y="129.54"/>
 <instance part="SUPPLY9" gate="G$1" x="17.78" y="139.7"/>
 <instance part="GND11" gate="1" x="17.78" y="116.84"/>
 <instance part="GND1" gate="1" x="38.1" y="149.86"/>
-<instance part="D1" gate="G$1" x="205.74" y="81.28"/>
+<instance part="D1" gate="G$1" x="208.28" y="81.28"/>
 <instance part="PWR_SW" gate="G$1" x="15.24" y="50.8"/>
 <instance part="GPS_RX_ALT" gate="G$1" x="226.06" y="142.24"/>
 <instance part="GPS_TX_ALT" gate="G$1" x="226.06" y="119.38"/>
@@ -10274,7 +10282,7 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <wire x1="195.58" y1="81.28" x2="195.58" y2="78.74" width="0.1524" layer="91"/>
 <wire x1="195.58" y1="81.28" x2="185.42" y2="81.28" width="0.1524" layer="91"/>
 <junction x="195.58" y="81.28"/>
-<wire x1="195.58" y1="81.28" x2="203.2" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="195.58" y1="81.28" x2="205.74" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="D1" gate="G$1" pin="A"/>
 </segment>
 <segment>
@@ -10310,9 +10318,9 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <wire x1="127" y1="132.08" x2="149.86" y2="132.08" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<wire x1="208.28" y1="81.28" x2="218.44" y2="81.28" width="0.1524" layer="91"/>
+<wire x1="210.82" y1="81.28" x2="220.98" y2="81.28" width="0.1524" layer="91"/>
 <pinref part="SUPPLY7" gate="G$1" pin="VUSB"/>
-<wire x1="218.44" y1="81.28" x2="218.44" y2="83.82" width="0.1524" layer="91"/>
+<wire x1="220.98" y1="81.28" x2="220.98" y2="83.82" width="0.1524" layer="91"/>
 <pinref part="D1" gate="G$1" pin="C"/>
 </segment>
 <segment>
@@ -10408,23 +10416,23 @@ B340A  3A 40V SMA &lt;br&gt;</description>
 <label x="66.04" y="66.04" size="1.27" layer="95" xref="yes"/>
 </segment>
 <segment>
-<pinref part="TEENSY" gate="G$1" pin="2"/>
-<wire x1="190.5" y1="147.32" x2="185.42" y2="147.32" width="0.1524" layer="91"/>
-<label x="190.5" y="147.32" size="1.27" layer="95" xref="yes"/>
+<wire x1="144.78" y1="142.24" x2="149.86" y2="142.24" width="0.1524" layer="91"/>
+<label x="144.78" y="142.24" size="1.27" layer="95" rot="R180" xref="yes"/>
+<pinref part="TEENSY" gate="G$1" pin="A14/DAC"/>
 </segment>
 </net>
 </nets>
 </sheet>
 </sheets>
 <errors>
-<approved hash="104,1,149.86,81.28,IC1,VDD,VUSB,,,"/>
-<approved hash="104,1,149.86,66.04,IC1,VSS,GND,,,"/>
+<approved hash="104,1,149.86,81.28,U1,VDD,VUSB,,,"/>
+<approved hash="104,1,149.86,66.04,U1,VSS,GND,,,"/>
 <approved hash="208,1,195.58,83.82,VBAT,sup,,,,"/>
 <approved hash="208,1,185.42,81.28,VBAT,out,,,,"/>
-<approved hash="208,1,33.02,129.54,VBAT,sup,,,,"/>
-<approved hash="208,1,27.94,45.72,VBAT,sup,,,,"/>
-<approved hash="113,1,216.651,147.32,J7,,,,,"/>
-<approved hash="113,1,216.651,124.46,J8,,,,,"/>
+<approved hash="208,1,33.02,73.66,VBAT,sup,,,,"/>
+<approved hash="208,1,27.94,139.7,VBAT,sup,,,,"/>
+<approved hash="113,1,231.126,142.24,GPS_RX_ALT,,,,,"/>
+<approved hash="113,1,230.987,119.38,GPS_TX_ALT,,,,,"/>
 </errors>
 </schematic>
 </drawing>
