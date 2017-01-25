@@ -698,20 +698,19 @@ CC-4.0-BY-SA</text>
 <rectangle x1="-3" y1="-1.225" x2="-1.4" y2="-0.725" layer="29"/>
 <rectangle x1="1.4" y1="-1.225" x2="3" y2="-0.725" layer="29"/>
 </package>
-<package name="COW">
-<wire x1="0" y1="5" x2="-5.5" y2="7" width="0.5" layer="21" curve="-45"/>
-<wire x1="0" y1="5" x2="5.5" y2="7" width="0.5" layer="21" curve="45"/>
-<wire x1="0" y1="6.35" x2="-1.27" y2="-3.81" width="0.5" layer="21" curve="161.075356"/>
-<wire x1="1.27" y1="-3.81" x2="0" y2="6.35" width="0.5" layer="21" curve="161.075356"/>
-<wire x1="-1.27" y1="-3.81" x2="1.27" y2="-3.81" width="0.5" layer="21" curve="30"/>
-<wire x1="0.508" y1="1.524" x2="3.048" y2="2.54" width="0.5" layer="21"/>
-<wire x1="-0.508" y1="1.524" x2="-3.048" y2="2.54" width="0.5" layer="21"/>
-<wire x1="-1.27" y1="-1.27" x2="-3.5" y2="-2.5" width="0.5" layer="21" curve="67.380135"/>
-<wire x1="1.27" y1="-1.27" x2="3.5" y2="-2.5" width="0.5" layer="21" curve="-67.380135"/>
-<wire x1="-3.5" y1="-2.5" x2="-2.5" y2="-5" width="0.5" layer="21" curve="60"/>
-<wire x1="3.5" y1="-2.5" x2="2.5" y2="-5" width="0.5" layer="21" curve="-60"/>
-<wire x1="-2.5" y1="-5" x2="2.5" y2="-5" width="0.5" layer="21" curve="70"/>
-<wire x1="-2.54" y1="0.508" x2="2.54" y2="0.508" width="0.5" layer="21"/>
+<package name="COW_SMALL">
+<wire x1="-2.286" y1="2.54" x2="2.286" y2="2.54" width="0.3048" layer="21" curve="121.890792"/>
+<wire x1="0.254" y1="0" x2="1.27" y2="0.508" width="0.3048" layer="21"/>
+<wire x1="-0.254" y1="0" x2="-1.27" y2="0.508" width="0.3048" layer="21"/>
+<wire x1="-1.27" y1="-0.508" x2="1.27" y2="-0.508" width="0.3048" layer="21"/>
+<wire x1="1.778" y1="-1.524" x2="-1.778" y2="-1.524" width="0.3048" layer="21" curve="-140"/>
+<wire x1="2.032" y1="-1.016" x2="-2.032" y2="-0.762" width="0.3048" layer="21" curve="220"/>
+<wire x1="1.778" y1="-1.524" x2="2.032" y2="-1.016" width="0.3048" layer="21"/>
+<wire x1="-1.778" y1="-1.524" x2="-2.032" y2="-0.762" width="0.3048" layer="21"/>
+<wire x1="-1.27" y1="-2.286" x2="1.27" y2="-2.286" width="0.3048" layer="21" curve="180"/>
+<wire x1="-1.27" y1="-2.286" x2="-0.762" y2="-1.27" width="0.3048" layer="21" curve="-75"/>
+<wire x1="1.27" y1="-2.286" x2="0.762" y2="-1.27" width="0.3048" layer="21" curve="75"/>
+<text x="0" y="-4.064" size="0.6096" layer="21" font="vector" ratio="15" align="center">deathbycow</text>
 </package>
 </packages>
 </library>
@@ -906,14 +905,14 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="DESIGNER" value="sean@yak.net" x="13.97" y="-3.81" size="1.778" layer="27" display="off"/>
 </element>
 <element name="C1" library="a_parts" package="C1210" value="10uF" x="36.83" y="10.16" smashed="yes" rot="R180">
-<attribute name="NAME" x="34.29" y="10.16" size="0.8128" layer="25" font="vector" ratio="10" rot="R90" align="bottom-center"/>
-<attribute name="VALUE" x="39.37" y="10.16" size="0.6096" layer="27" font="vector" ratio="10" rot="R90" align="top-center"/>
+<attribute name="NAME" x="34.163" y="10.16" size="0.8128" layer="25" font="vector" ratio="10" rot="R90" align="bottom-center"/>
+<attribute name="VALUE" x="39.497" y="10.16" size="0.6096" layer="21" font="vector" ratio="10" rot="R90" align="top-center"/>
 </element>
 <element name="I2C" library="a_parts" package="1X04_SMD_RA_2MM_I2C" value="M04-I2CSMD_2MM_RA" x="43.18" y="14.605" smashed="yes">
-<attribute name="NAME" x="43.18" y="12.573" size="1.016" layer="25" font="vector" ratio="10" align="top-center"/>
+<attribute name="NAME" x="43.18" y="12.446" size="1.016" layer="25" font="vector" ratio="10" align="top-center"/>
 </element>
 <element name="DISPLAY" library="a_parts" package="1X10_SMD_RA_MALE" value="M10SMD_RA_2MM" x="28.575" y="14.605" smashed="yes">
-<attribute name="NAME" x="28.542" y="12.565" size="1.016" layer="25" font="vector" ratio="10" align="top-center"/>
+<attribute name="NAME" x="28.542" y="12.438" size="1.016" layer="25" font="vector" ratio="10" align="top-center"/>
 </element>
 <element name="R1" library="a_parts" package="R0603-TIGHTER" value="4K7" x="13.97" y="12.065" smashed="yes" rot="MR0">
 <attribute name="NAME" x="15.52" y="12.065" size="0.8128" layer="26" font="vector" ratio="10" rot="MR90" align="bottom-center"/>
@@ -941,26 +940,26 @@ Please make sure your boards conform to these design rules.</description>
 <attribute name="SUPPLIER" value="Microchip" x="35.56" y="3.175" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="OC_FARNELL" value="1332158" x="35.56" y="3.175" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="NAME" x="35.56" y="4.925" size="0.8128" layer="25" font="vector" ratio="10" rot="SR0" align="bottom-center"/>
-<attribute name="VALUE" x="35.56" y="1.425" size="0.6096" layer="27" font="vector" ratio="10" rot="R180" align="bottom-center"/>
+<attribute name="VALUE" x="35.56" y="1.425" size="0.6096" layer="21" font="vector" ratio="10" rot="R180" align="bottom-center"/>
 </element>
 <element name="CHRG" library="a_parts" package="LED-0603-TIGHT" value="LED0603-TIGHT" x="44.45" y="3.175" smashed="yes" rot="R270">
 <attribute name="NAME" x="44.45" y="4.826" size="0.7" layer="25" font="vector" ratio="10" align="bottom-center"/>
 </element>
 <element name="R6" library="a_parts" package="R0603-TIGHTER" value="1K" x="41.91" y="3.175" smashed="yes" rot="R270">
 <attribute name="NAME" x="41.91" y="4.826" size="0.8128" layer="25" font="vector" ratio="10" align="bottom-center"/>
-<attribute name="VALUE" x="41.91" y="1.625" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
+<attribute name="VALUE" x="41.91" y="1.498" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
 </element>
 <element name="R3" library="a_parts" package="R0603-TIGHTER" value="2K" x="29.21" y="3.175" smashed="yes" rot="R270">
 <attribute name="NAME" x="29.21" y="4.826" size="0.8128" layer="25" font="vector" ratio="10" align="bottom-center"/>
-<attribute name="VALUE" x="29.21" y="1.625" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
+<attribute name="VALUE" x="29.21" y="1.498" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
 </element>
 <element name="C2" library="a_parts" package="C0603-TIGHTER" value="4u7" x="39.37" y="3.175" smashed="yes" rot="R270">
 <attribute name="NAME" x="39.37" y="4.826" size="0.8128" layer="25" font="vector" ratio="10" align="bottom-center"/>
-<attribute name="VALUE" x="39.37" y="1.651" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
+<attribute name="VALUE" x="39.37" y="1.524" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
 </element>
 <element name="C3" library="a_parts" package="C0603-TIGHTER" value="4u7" x="31.75" y="3.175" smashed="yes" rot="R270">
 <attribute name="NAME" x="31.75" y="4.826" size="0.8128" layer="25" font="vector" ratio="10" align="bottom-center"/>
-<attribute name="VALUE" x="31.75" y="1.651" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
+<attribute name="VALUE" x="31.75" y="1.524" size="0.6096" layer="25" font="vector" ratio="10" align="top-center"/>
 </element>
 <element name="D1" library="a_parts" package="SOD123-SCHOTTKY" value="MBRS0540" x="35.56" y="6.985" smashed="yes" rot="R180">
 <attribute name="NAME" x="32.991" y="6.985" size="0.8128" layer="25" font="vector" ratio="10" rot="R90" align="bottom-center"/>
@@ -977,17 +976,17 @@ Please make sure your boards conform to these design rules.</description>
 </element>
 <element name="U2" library="a_parts" package="MSOP-8" value="LTC2941" x="47.625" y="8.255" smashed="yes" rot="R90">
 <attribute name="NAME" x="45.925" y="8.255" size="0.8128" layer="25" font="vector" ratio="10" rot="R90" align="bottom-center"/>
-<attribute name="VALUE" x="49.325" y="8.255" size="0.6096" layer="27" font="vector" ratio="10" rot="R90" align="top-center"/>
+<attribute name="VALUE" x="49.452" y="8.255" size="0.6096" layer="21" font="vector" ratio="10" rot="R90" align="top-center"/>
 </element>
 <element name="R4" library="a_parts" package="R0603-TIGHTER" value="0R1" x="43.815" y="8.255" smashed="yes" rot="R270">
 <attribute name="NAME" x="43.815" y="9.779" size="0.8128" layer="25" font="vector" ratio="10" align="bottom-center"/>
-<attribute name="VALUE" x="43.815" y="6.731" size="0.6096" layer="27" font="vector" ratio="10" align="top-center"/>
+<attribute name="VALUE" x="43.815" y="6.604" size="0.6096" layer="21" font="vector" ratio="10" align="top-center"/>
 </element>
 <element name="C4" library="a_parts" package="C0603-TIGHTER" value="100n" x="41.275" y="8.255" smashed="yes" rot="R90">
 <attribute name="NAME" x="41.275" y="9.779" size="0.8128" layer="25" font="vector" ratio="10" align="bottom-center"/>
-<attribute name="VALUE" x="41.275" y="6.705" size="0.6096" layer="27" font="vector" ratio="10" align="top-center"/>
+<attribute name="VALUE" x="41.275" y="6.578" size="0.6096" layer="21" font="vector" ratio="10" align="top-center"/>
 </element>
-<element name="U$1" library="a_parts" package="COW" value="" x="8.89" y="12.7"/>
+<element name="U$1" library="a_parts" package="COW_SMALL" value="" x="8.89" y="16.002"/>
 </elements>
 <signals>
 <signal name="GND">
