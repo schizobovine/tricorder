@@ -257,7 +257,6 @@ void displayValues_batt() {
 
 void setup() {
 
-  delay(1000);
   Serial.begin(9600);
   Serial.println(F("Tricorder v2.0-teensy (Built " __DATE__ " " __TIME__")"));
 
