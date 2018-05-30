@@ -39,11 +39,11 @@
 // 0x10 15
 // 0x20 45
 
-#define DISP_DC      (15) //A1
-#define DISP_RST     (17) //A2
+#define DISP_DC      (15)
+#define DISP_RST     (14)
 #define DISP_CS      (10)
-#define SD_CS        (14) //A4
-#define SD_CARDSW    (20) //A5
+#define SD_CS        (16)
+#define SD_CARDSW    (17)
 #define BATT_DIV     (21)
 
 // 16-bit color is weird: 5 bits for R & B, but 6 for G? I guess humans are
@@ -57,6 +57,10 @@ typedef ssd1351::LowColor Color;     // 16 (5/6/5)
 // Enable or disable double buffer
 //typedef ssd1351::NoBuffer Buffer;
 typedef ssd1351::SingleBuffer Buffer;
+
+// Display dimensions
+#define DISP_H (128)
+#define DISP_W (128)
 
 // Define some color consts
 
@@ -77,8 +81,10 @@ typedef ssd1351::SingleBuffer Buffer;
 #define COLOR_WHITE    (0xFFFF) // 0b1111111111111111 (100%, 100%, 100%)
 
 // "Special" characters
-#define STR_DEGREE  "\367"
-#define STR_SQUARED "\374"
+//#define STR_DEGREE  "\367"
+//#define STR_SQUARED "\374"
+#define DEG  "\370" // 248 or 0xF8
+#define STR_SQUARED "\375" // 253 or 0xFD
 
 // Misc
 #define SD_FILENAME ("tricorder.log")
@@ -90,7 +96,7 @@ File logfile;
 bool card_present = false;
 
 // Display controller
-auto display = ssd1351::SSD1351<Color,Buffer>(DISP_CS, DISP_DC, DISP_RST);
+auto display = ssd1351::SSD1351<Color,Buffer,DISP_H,DISP_W>(DISP_CS, DISP_DC, DISP_RST);
 
 // Sensors
 VEML6075           veml6075  = VEML6075();
@@ -155,8 +161,6 @@ sensval_t curr, last;
 #define DISPLAY_READING(color, x, y, prec, width, name) \
   do { \
     /*if (last.name != curr.name) { */ \
-      display.setTextColor(COLOR_BLACK); \
-      display.fillRect((x), (y), (width)*6, 8, COLOR_BLACK); \
       last.name = curr.name; \
       display.setTextColor((color), COLOR_BLACK); \
       display.setCursor((x), (y)); \
@@ -171,29 +175,45 @@ sensval_t curr, last;
 ////////////////////////////////////////////////////////////////////////
 
 float getBattVoltage() {
-  float measured = analogRead(BATT_DIV);
-  return measured / ((float)(1 << ANALOG_RES)) * 2.0 * 3.3;
+  //float measured = analogRead(BATT_DIV);
+  //return measured / ((float)(1 << ANALOG_RES)) * 2.0 * 3.3;
+  return 0.0;
 }
 
 void displayLabels() {
   ////////////////////////////////////////////////////////////////////////////
   //           |color      | x|   y| label                             
   ////////////////////////////////////////////////////////////////////////////
-  DISPLAY_LABEL(COLOR_WHITE, 0,   0, F("Tricorder  Batt     V"));
-  DISPLAY_LABEL(COLOR_WHITE, 0,   8, F("   Tamb  Trem   R    "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  16, F(STR_DEGREE "C              G    "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  24, F(STR_DEGREE "F              B    "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  32, F("IR         UVA       "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  40, F("Vis        UVB       "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  48, F("lux        UVI       "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  56, F("Prel        kPa RH   "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  64, F("Pabs        kPa    % "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  72, F("    acc   mag  gyro  "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  80, F("x                    "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  88, F("y                    "));
-  DISPLAY_LABEL(COLOR_WHITE, 0,  96, F("z                    "));
-  DISPLAY_LABEL(COLOR_WHITE, 0, 104, F("lat         " STR_DEGREE "     alt"));
-  DISPLAY_LABEL(COLOR_WHITE, 0, 112, F("lon         " STR_DEGREE "       m"));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,   0, F("Tricorder  Batt     V"));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,   8, F("   Tamb  Trem   R    "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  16, F(DEG "C              G    "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  24, F(DEG "F              B    "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  32, F("IR         UVA       "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  40, F("Vis        UVB       "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  48, F("lux        UVI       "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  56, F("Prel        kPa RH   "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  64, F("Pabs        kPa    % "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  72, F("    acc   mag  gyro  "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  80, F("x                    "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  88, F("y                    "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0,  96, F("z                    "));
+  //DISPLAY_LABEL(COLOR_WHITE, 0, 104, F("lat         " DEG "     alt"));
+  //DISPLAY_LABEL(COLOR_WHITE, 0, 112, F("lon         " DEG "       m"));
+  DISPLAY_LABEL(COLOR_WHITE, 0,   8, F("Tricorder  Batt     V"));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  16, F("   Tamb  Trem   R    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  24, F(DEG "C              G    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  32, F(DEG "F              B    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  40, F("IR         UVA       "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  48, F("Vis        UVB       "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  56, F("lux        UVI       "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  64, F("Prel        kPa RH   "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  72, F("Pabs        kPa    % "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  80, F("    acc   mag  gyro  "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  88, F("x                    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0,  96, F("y                    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0, 104, F("z                    "));
+  DISPLAY_LABEL(COLOR_WHITE, 0, 112, F("lat         " DEG "     alt"));
+  DISPLAY_LABEL(COLOR_WHITE, 0, 120, F("lon         " DEG "       m"));
 }
 
 void displayValues_veml6075() {
@@ -201,12 +221,52 @@ void displayValues_veml6075() {
   //DISPLAY_READING(COLOR_WHITE, 90, 32, 0, 5, uva);
   //DISPLAY_READING(COLOR_WHITE, 90, 40, 0, 5, uvb);
   //DISPLAY_READING(COLOR_WHITE, 90, 48, 5, 5, uvi);
-  DISPLAY_READING(COLOR_WHITE, 90, 32, 0, 5, raw_uva);
-  DISPLAY_READING(COLOR_WHITE, 90, 40, 0, 5, raw_uvb);
-  DISPLAY_READING(COLOR_WHITE, 90, 48, 0, 5, raw_dark);
-  DISPLAY_READING(COLOR_WHITE, 24, 32, 0, 5, raw_ir_comp);
-  DISPLAY_READING(COLOR_WHITE, 24, 40, 0, 5, raw_vis_comp);
+  DISPLAY_READING(COLOR_WHITE, 90, 40, 0, 5, raw_uva);
+  DISPLAY_READING(COLOR_WHITE, 90, 48, 0, 5, raw_uvb);
+  DISPLAY_READING(COLOR_WHITE, 90, 56, 0, 5, raw_dark);
+  DISPLAY_READING(COLOR_WHITE, 24, 40, 0, 5, raw_ir_comp);
+  DISPLAY_READING(COLOR_WHITE, 24, 48, 0, 5, raw_vis_comp);
 }
+
+/*
+void displayLabels() {
+  DISPLAY_LABEL(COLOR_BROWN,      0,  16, F("  IR"));
+  //DISPLAY_LABEL(COLOR_GREEN,     0,  24, F(" Vis"));
+  DISPLAY_LABEL(COLOR_PURPLE,     0,  24, F(" UVA"));
+  DISPLAY_LABEL(COLOR_PURPLE,     0,  32, F(" UVB"));
+  DISPLAY_LABEL(COLOR_PURPLE,     0,  40, F(" UVI"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("Temperature"));
+  //DISPLAY_LABEL(COLOR_WHITE,      0,  48, F("Fa"));
+  //DISPLAY_LABEL(COLOR_WHITE,      0,  56, F(" Amb"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  64, F(" RH%"));
+  //DISPLAY_LABEL(COLOR_WHITE,     0,  72, F("  CT"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  80, F("Batt"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  88, F("Pres"));
+  DISPLAY_LABEL(COLOR_WHITE,      0,  96, F(" Alt"));
+  DISPLAY_LABEL(COLOR_WHITE,      0, 104, F("Thrm"));
+
+  DISPLAY_LABEL(COLOR_WHITE,     70,  16, F("Visible"));
+  DISPLAY_LABEL(COLOR_WHITE,     70,  24, F("R"));
+  DISPLAY_LABEL(COLOR_WHITE,     70,  32, F("G"));
+  DISPLAY_LABEL(COLOR_WHITE,     70,  40, F("B"));
+  //DISPLAY_LABEL(COLOR_WHITE,    70,  48, F("  CT"));
+  //DISPLAY_LABEL(COLOR_WHITE,    70,  56, F(" Vis"));
+}
+
+void displayUnits() {
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  16, F("W/m" STR_SQUARED));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  24, F("lux"));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  32, F("W/m" STR_SQUARED));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  40, F("W/m" STR_SQUARED));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  48, F(DEG "C IR"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  56, F(DEG "C Amb"));
+  //DISPLAY_LABEL(COLOR_WHITE, 60,  64, F("%"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  72, F("K"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  80, F("V"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  88, F("kPa"));
+  DISPLAY_LABEL(COLOR_WHITE, 60,  96, F("m"));
+}
+*/
 
 void displayValues_mlx90614() {
   // color, x, y, precision, value
@@ -216,39 +276,41 @@ void displayValues_mlx90614() {
 
 void displayValues_hdc1080() {
   // color, x, y, precision, value
-  DISPLAY_READING(COLOR_WHITE, 18, 16, 1, 5, temp);
-  DISPLAY_READING(COLOR_WHITE, 18, 24, 1, 5, temp_f);
-  DISPLAY_READING(COLOR_WHITE, 96, 64, 0, 3, rh);
+  DISPLAY_READING(COLOR_WHITE, 18, 24, 1, 5, temp);
+  DISPLAY_READING(COLOR_WHITE, 18, 32, 1, 5, temp_f);
+  DISPLAY_READING(COLOR_WHITE, 96, 72, 0, 3, rh);
 }
 
 void displayValues_ms5611() {
   // color, x, y, precision, value
-  DISPLAY_READING(COLOR_WHITE, 30, 56, 2, 6, press_rel);
-  DISPLAY_READING(COLOR_WHITE, 30, 64, 2, 6, press_abs);
-  DISPLAY_READING(COLOR_WHITE, 84, 112, 0, 5, alt);
+  DISPLAY_READING(COLOR_WHITE, 30, 64, 2, 6, press_rel);
+  DISPLAY_READING(COLOR_WHITE, 30, 72, 2, 6, press_abs);
+  DISPLAY_READING(COLOR_WHITE, 84, 120, 0, 5, alt);
 }
 
 void displayValues_lsm9ds0() {
   // color, x, y, precision, value
-  DISPLAY_READING(COLOR_WHITE, 12, 80, 0, 6, acc_x);
-  DISPLAY_READING(COLOR_WHITE, 12, 88, 0, 6, acc_y);
-  DISPLAY_READING(COLOR_WHITE, 12, 96, 0, 6, acc_z);
-  DISPLAY_READING(COLOR_WHITE, 48, 80, 0, 6, mag_x);
-  DISPLAY_READING(COLOR_WHITE, 48, 88, 0, 6, mag_y);
-  DISPLAY_READING(COLOR_WHITE, 48, 96, 0, 6, mag_z);
-  DISPLAY_READING(COLOR_WHITE, 84, 80, 0, 6, gyro_x);
-  DISPLAY_READING(COLOR_WHITE, 84, 88, 0, 6, gyro_y);
-  DISPLAY_READING(COLOR_WHITE, 84, 96, 0, 6, gyro_z);
+  DISPLAY_READING(COLOR_WHITE, 12,  88, 0, 6, acc_x);
+  DISPLAY_READING(COLOR_WHITE, 12,  96, 0, 6, acc_y);
+  DISPLAY_READING(COLOR_WHITE, 12, 104, 0, 6, acc_z);
+
+  DISPLAY_READING(COLOR_WHITE, 48,  88, 0, 6, mag_x);
+  DISPLAY_READING(COLOR_WHITE, 48,  96, 0, 6, mag_y);
+  DISPLAY_READING(COLOR_WHITE, 48, 104, 0, 6, mag_z);
+
+  DISPLAY_READING(COLOR_WHITE, 84,  88, 0, 6, gyro_x);
+  DISPLAY_READING(COLOR_WHITE, 84,  96, 0, 6, gyro_y);
+  DISPLAY_READING(COLOR_WHITE, 84, 104, 0, 6, gyro_z);
 }
 
 void displayValues_gps() {
   // color, x, y, precision, value
-  //DISPLAY_READING(COLOR_WHITE, 96, 0, 2, 4, batt_v);
+  //DISPLAY_READING(COLOR_WHITE, 96, 8, 2, 4, batt_v);
 }
 
 void displayValues_batt() {
   // color, x, y, precision, value
-  //DISPLAY_READING(COLOR_WHITE, 96, 0, 2, 4, batt_v);
+  //DISPLAY_READING(COLOR_WHITE, 96, 8, 2, 4, batt_v);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -257,14 +319,9 @@ void displayValues_batt() {
 
 void setup() {
 
-  Serial.begin(9600);
+  delay(500);
+  Serial.begin(115200);
   Serial.println(F("Tricorder v2.0-teensy (Built " __DATE__ " " __TIME__")"));
-
-  // Set CS pins as outputs and set all high by default
-  pinMode(DISP_CS, OUTPUT);
-  pinMode(SD_CS, OUTPUT);
-  digitalWrite(DISP_CS, HIGH);
-  digitalWrite(SD_CS, HIGH);
 
   // Setup ADC
   analogReadResolution(ANALOG_RES);
@@ -272,9 +329,14 @@ void setup() {
   // Init display
   delay(100);
   display.begin();
-  //display.setTextSize(1);
-  display.setFont(OGFont);
+  display.sleep(false);
   display.fillScreen(COLOR_BLACK);
+  //display.updateScreen();
+  display.setTextSize(1);
+  //display.cp437();
+  //display.setFont(OGFont);
+  //display.setFont(Picopixel);
+  //display.setFont(NULL);
   displayLabels();
   display.updateScreen();
   Serial.println("display init complete");
@@ -363,14 +425,16 @@ void loop() {
   /// // Display readings refresh
   /// //
 
-  /// displayValues_batt();
-  /// displayValues_veml6075();
-  /// displayValues_mlx90614();
-  /// displayValues_hdc1080(); 
-  /// displayValues_ms5611();
-  /// displayValues_lsm9ds0();
-  /// displayValues_gps();
-  /// display.updateScreen();
+  display.fillScreen(COLOR_BLACK);
+  displayLabels();
+  displayValues_batt();
+  displayValues_veml6075();
+  displayValues_mlx90614();
+  displayValues_hdc1080(); 
+  displayValues_ms5611();
+  displayValues_lsm9ds0();
+  displayValues_gps();
+  display.updateScreen();
 
   // Delay between data polls
   delay(100);
