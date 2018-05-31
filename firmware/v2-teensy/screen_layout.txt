@@ -1,0 +1,15 @@
+0,   8, Tricorder  Batt     V"));
+0,  16,    Tamb  Trem   R    "));
+0,  24, °C              G    "));
+0,  32, °F              B    "));
+0,  40, IR         UVA       "));
+0,  48, Vis        UVB       "));
+0,  56, lux        UVI       "));
+0,  64, Prel        kPa RH   "));
+0,  72, Pabs        kPa    % "));
+0,  80,     acc   mag  gyro  "));
+0,  88, x                    "));
+0,  96, y                    "));
+0, 104, z                    "));
+0, 112, lat         " DEG "     alt"));
+0, 120, lon         " DEG "       m"));
