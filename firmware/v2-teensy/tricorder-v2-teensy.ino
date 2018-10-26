@@ -133,15 +133,15 @@ typedef struct sensval {
   uint8_t color_r = 255;
   uint8_t color_g = 255;
   uint8_t color_b = 255;
-  uint16_t acc_x = -1.0;
-  uint16_t acc_y = -1.0;
-  uint16_t acc_z = -1.0;
-  uint16_t mag_x = -1.0;
-  uint16_t mag_y = -1.0;
-  uint16_t mag_z = -1.0;
-  uint16_t gyr_x = -1.0;
-  uint16_t gyr_y = -1.0;
-  uint16_t gyr_z = -1.0;
+  uint16_t acc_x = 0;
+  uint16_t acc_y = 0;
+  uint16_t acc_z = 0;
+  uint16_t mag_x = 0;
+  uint16_t mag_y = 0;
+  uint16_t mag_z = 0;
+  uint16_t gyr_x = 0;
+  uint16_t gyr_y = 0;
+  uint16_t gyr_z = 0;
 
 } sensval_t;
 
@@ -160,19 +160,19 @@ sensval_t curr, last;
     display.print(val); \
   } while (0)
 
-#define DISPLAY_LABEL_COLOR(color, x, y, val) \
+#define DISPLAY_LABEL_RGB(x, y, val, color) \
   do { \
     display.setCursor(x, y); \
     display.setTextColor(color); \
     display.print(val); \
   } while (0)
 
-#define DISPLAY_READING(x, y, prec, name) \
+#define DISPLAY_READING(x, y, print_arg, name) \
   do { \
     /*if (last.name != curr.name) { */ \
       last.name = curr.name; \
       display.setCursor((x), (y)); \
-      display.print(curr.name, prec); \
+      display.print(curr.name, print_arg); \
     /*}*/ \
   } while (0);
 
@@ -189,46 +189,64 @@ float getBattVoltage() {
 }
 
 void displayLabels() {
-  // <color>, <x>, <y>, <label_text>
-  DISPLAY_LABEL(  0, 16, F("RH"));
-  DISPLAY_LABEL( 36, 16, F("%"));
-  DISPLAY_LABEL(  0, 24, F("Ta"));
-  DISPLAY_LABEL(  0, 32, F("Tr"));
-  DISPLAY_LABEL(  0, 40, F("Pr"));
-  DISPLAY_LABEL( 60, 40, F("Pa"));
 
+  //            <x>, <y>, <label_text>
+  DISPLAY_LABEL(  0,  16, F("RH"));    // (hdc1080) relative humidity
+  DISPLAY_LABEL( 36,  16, F("%"));
+
+  DISPLAY_LABEL(  0,  24, F("Ta"));    // (mlx90614) temp (ambient)
   DISPLAY_LABEL( 48,  24, F(STR_DEG));
+  DISPLAY_LABEL(  0,  32, F("Tr"));    // (mlx90614) temp (remote)
   DISPLAY_LABEL( 48,  32, F(STR_DEG));
-                 
-  DISPLAY_LABEL_COLOR(COLOR_RED,   60, 16, F("R"));
-  DISPLAY_LABEL_COLOR(COLOR_GREEN, 60, 24, F("G"));
-  DISPLAY_LABEL_COLOR(COLOR_BLUE,  60, 32, F("B"));
-                 
-  DISPLAY_LABEL_COLOR(COLOR_WHITE, 96, 16, F("COLOR"));
-  DISPLAY_LABEL(102, 24, F("TEMP"));
-                 
-  DISPLAY_LABEL(  0, 48, F("lat"));
-  DISPLAY_LABEL(  0, 56, F("IR"));
-  DISPLAY_LABEL(  0, 64, F("VIS"));
-  DISPLAY_LABEL(  0, 72, F("UVI"));
-  DISPLAY_LABEL(  0, 80, F("UVA"));
-  DISPLAY_LABEL(  0, 88, F("UVB"));
-                 
-  DISPLAY_LABEL(  0, 104, F("Acc"));
-  DISPLAY_LABEL(  0, 112, F("Mag"));
-  DISPLAY_LABEL(  0, 120, F("Gyr"));
 
-  DISPLAY_LABEL( 36,  96, F("X"));
-  DISPLAY_LABEL( 72,  96, F("Y"));
-  DISPLAY_LABEL(108,  96, F("Z"));
+  DISPLAY_LABEL(  0,  40, F("Pr"));    // (ms5611) pressure (relative)
+  DISPLAY_LABEL( 60,  40, F("Pa"));    // (ms5611) pressure (absolute)
 
-  DISPLAY_LABEL( 60,  48, F("lon"));
-  DISPLAY_LABEL( 60,  56, F("alt"));
+  //                <x>, <y>, <text>, <color>
+  DISPLAY_LABEL_RGB( 60,  16, F("R"), COLOR_RED,   ); // (tcs3400) red
+  DISPLAY_LABEL_RGB( 60,  24, F("G"), COLOR_GREEN, ); // (tcs3400) green
+  DISPLAY_LABEL_RGB( 60,  32, F("B"), COLOR_BLUE,  ); // (tcs3400) blue
+                 
+  DISPLAY_LABEL( 96,  16, F("COLOR")); // (tcs3400) color temp
+  DISPLAY_LABEL(102,  24, F("TEMP"));
+                 
+  DISPLAY_LABEL(  0,  48, F("lat"));   // (gps) latitude
+  DISPLAY_LABEL( 60,  48, F("lon"));   // (gps) longitude
 
-  DISPLAY_LABEL( 60,  72, F("RawIR"));
-  DISPLAY_LABEL( 68,  80, F("VIS"));
-  DISPLAY_LABEL( 64,  88, F("dark"));
+  DISPLAY_LABEL( 60,  56, F("alt"));   // (ms5611) altitude (m)
 
+  DISPLAY_LABEL(  0,  56, F("IR"));    // (veml6075) IR channel (?)
+  DISPLAY_LABEL(  0,  64, F("VIS"));   // (veml6075) visible channel (?)
+  DISPLAY_LABEL(  0,  72, F("UVI"));   // (veml6075) UV index
+  DISPLAY_LABEL(  0,  80, F("UVA"));   // (veml6075) UVA channel
+  DISPLAY_LABEL(  0,  88, F("UVB"));   // (veml6075) UVB channel
+                 
+  DISPLAY_LABEL(  0, 104, F("Acc"));   // (lsm9ds0) accelerometer
+  DISPLAY_LABEL(  0, 112, F("Mag"));   // (lsm9ds0) magnetometer
+  DISPLAY_LABEL(  0, 120, F("Gyr"));   // (lsm9ds0) gyroscope
+
+  DISPLAY_LABEL( 36,  96, F("X"));     // (lsm9ds0) x-values
+  DISPLAY_LABEL( 72,  96, F("Y"));     // (lsm9ds0) y-values
+  DISPLAY_LABEL(108,  96, F("Z"));     // (lsm9ds0) z-values
+
+  DISPLAY_LABEL( 60,  72, F("RawIR")); // (veml6075) raw IR channel
+  DISPLAY_LABEL( 68,  80, F("VIS"));   // (veml6075) raw IR channel
+  DISPLAY_LABEL( 64,  88, F("dark"));  // (veml6075) raw IR channel
+
+}
+
+void displayValues_tcs3400() {
+  DISPLAY_LABEL_RGB( 60,  16, F("R"), COLOR_RED,   ); // (tcs3400) red
+  DISPLAY_LABEL_RGB( 60,  24, F("G"), COLOR_GREEN, ); // (tcs3400) green
+  DISPLAY_LABEL_RGB( 60,  32, F("B"), COLOR_BLUE,  ); // (tcs3400) blue
+                 
+  DISPLAY_LABEL( 96,  16, F("COLOR")); // (tcs3400) color temp
+  DISPLAY_LABEL(102,  24, F("TEMP"));
+  // x, y, print_arg, $name
+  //DISPLAY_READING( 66,  16, 0, color_r);
+  //DISPLAY_READING( 66,  24, 0, color_g);
+  //DISPLAY_READING( 66,  32, 0, color_b);
+  //DISPLAY_READING( 60,  16, 0, color_temp);
 }
 
 void displayValues_veml6075() {
@@ -297,18 +315,6 @@ void setup() {
   // Setup ADC
   analogReadResolution(ANALOG_RES);
 
-  // Init display
-  delay(100);
-  display.begin();
-  display.sleep(false);
-  display.fillScreen(COLOR_BLACK);
-  display.setTextColor(COLOR_WHITE, COLOR_BLACK);
-  display.setTextSize(1);
-  display.setTextWrap(false);
-  displayLabels();
-  display.updateScreen();
-  Serial.println("display init complete");
-
   // Check if SD card is present (shorts to ground if not present)
   pinMode(SD_CARDSW, INPUT_PULLUP);
   if (digitalRead(SD_CARDSW) == HIGH) {
@@ -320,6 +326,18 @@ void setup() {
     }
   }
   Serial.println("SD init complete");
+
+  // Init display
+  delay(100);
+  display.begin();
+  display.sleep(false);
+  display.fillScreen(COLOR_BLACK);
+  display.setTextColor(COLOR_WHITE, COLOR_BLACK);
+  display.setTextSize(1);
+  display.setTextWrap(false);
+  displayLabels();
+  display.updateScreen();
+  Serial.println("display init complete");
 
   // Init i2C
   Wire.begin();
