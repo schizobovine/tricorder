@@ -230,8 +230,8 @@ void displayLabels() {
   DISPLAY_LABEL(108,  96, F("Z"));     // (lsm9ds0) z-values
 
   DISPLAY_LABEL( 60,  72, F("RawIR")); // (veml6075) raw IR channel
-  DISPLAY_LABEL( 68,  80, F("VIS"));   // (veml6075) raw IR channel
-  DISPLAY_LABEL( 64,  88, F("dark"));  // (veml6075) raw IR channel
+  DISPLAY_LABEL( 72,  80, F("VIS"));   // (veml6075) raw IR channel
+  DISPLAY_LABEL( 66,  88, F("dark"));  // (veml6075) raw IR channel
 
 }
 
