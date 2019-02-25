@@ -1,0 +1,40 @@
+160 ("H") x 128 ("L")
+
+
+
+ .  A 410nm
+ .  B 435nm
+ .  C 460nm
+ .  D 485nm
+ .  E 510nm
+ .  F 535nm
+ .  G 560nm
+ .  H 585nm
++   R 610nm
+ .  I 645nm
++   S 680nm
+ .  J 705nm
++   T 730nm
++   U 760nm
++   V 810nm
++   W 860nm
+ .  K 900nm
+ .  L 940nm
+
+a   := log(x, 2)
+b   := log(x, 10)
+e2  := log(2, e)
+e10 := log(2, e)
+
+             log(x, e)      log(x, e)
+log(x, 2)  = ---------   => --------- = a => log(x, e) = a * e2
+             log(2, e)         e2
+
+             log(x, e)      log(x, e)
+log(x, 10) = ----------  => --------- = b => log(x, e) = b * e10
+             log(10, e)        e10
+
+
+                        a * e2
+a * e2 = b * e10 => b = ------
+                         e10
