@@ -24,11 +24,6 @@
 #include <SFE_LSM9DS0.h>
 #include <MS5611.h>
 #include <TCS3400.h>
-//#include <Adafruit_VEML6075.h>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 
 // Pin config
 
@@ -88,10 +83,6 @@ typedef ssd1351::SingleBuffer Buffer;
 #define COLOR_WHITE    (0xFFFF) // 0b1111111111111111 (100%, 100%, 100%)
 
 // "Special" characters
-//#define STR_DEGREE  "\367"
-//#define STR_SQUARED "\374"
-//#define STR_DEG "\371" // 249 (substituted degress centigrade)
-//#define PCT "\372" // 250 (substituted percent)
 #define STR_DEG   "\216"
 #define STR_DEG_C "\216C"
 
@@ -111,7 +102,6 @@ auto display = ssd1351::SSD1351<Color,Buffer,DISP_H,DISP_W>(DISP_CS, DISP_DC, DI
 
 // Sensors
 VEML6075           veml6075  = VEML6075();
-//Adafruit_VEML6075  veml6075  = Adafruit_VEML6075();
 Adafruit_MLX90614  mlx90614  = Adafruit_MLX90614();
 ClosedCube_HDC1080 hdc1080   = ClosedCube_HDC1080();
 LSM9DS0            lsm9ds0   = LSM9DS0(MODE_I2C, I2C_ADDR_LSM9DS0_G, I2C_ADDR_LSM9DS0_XM);
@@ -180,22 +170,21 @@ sensval_t curr, last;
 
 #define DISPLAY_READING(x, y, print_arg, name) \
   do { \
-    /*if (last.name != curr.name) { */ \
-      last.name = curr.name; \
-      display.setCursor((x), (y)); \
-      display.print(curr.name, print_arg); \
-    /*}*/ \
-  } while (0);
+    last.name = curr.name; \
+    display.setCursor((x), (y)); \
+    display.print(curr.name, print_arg); \
+  } while (0)
 
 #define DISPLAY_READING_UNIT(x, y, print_arg, name, unit) \
   do { \
-    /*if (last.name != curr.name) { */ \
-      last.name = curr.name; \
-      display.setCursor((x), (y)); \
-      display.print(curr.name, print_arg); \
-      display.print(unit); \
-    /*}*/ \
-  } while (0);
+    last.name = curr.name; \
+    display.setCursor((x), (y)); \
+    display.print(curr.name, print_arg); \
+    display.print(unit); \
+  } while (0)
+
+#define SERIALPRINT(...)   if (Serial) { Serial.print(__VA_ARGS__);   }
+#define SERIALPRINTLN(...) if (Serial) { Serial.println(__VA_ARGS__); }
 
 #define C_TO_F(x) ((x) * 9.0/5.0 + 32.0)
 
@@ -309,9 +298,12 @@ void displayValues_batt() {
 
 void setup() {
 
-  delay(500);
-  Serial.begin(115200);
-  Serial.println(F("Tricorder v2.0-teensy (Built " __DATE__ " " __TIME__")"));
+  // Setup serial
+  delay(200);
+  if (Serial) {
+    Serial.begin(115200);
+    SERIALPRINTLN(F("Tricorder v2.0-teensy (Built " __DATE__ " " __TIME__")"));
+  }
 
   // Setup ADC
   analogReadResolution(ANALOG_RES);
@@ -326,7 +318,7 @@ void setup() {
       }
     }
   }
-  Serial.println("SD init complete");
+  SERIALPRINTLN("SD init complete");
 
   // Init display
   delay(100);
@@ -338,7 +330,7 @@ void setup() {
   display.setTextWrap(false);
   displayLabels();
   display.updateScreen();
-  Serial.println("display init complete");
+  SERIALPRINTLN("display init complete");
 
   // Init i2C
   Wire.begin();
@@ -349,16 +341,16 @@ void setup() {
   hdc1080.begin(I2C_ADDR_HDC1080);
   uint16_t status = lsm9ds0.begin();
   if (status != 0x49D4) {
-    Serial.print(F("LSM9DS0 init failed! status="));
-    Serial.println(status, HEX);
+    SERIALPRINT(F("LSM9DS0 init failed! status="));
+    SERIALPRINTLN(status, HEX);
   }
   if (!ms5611.begin()) {
-    Serial.print(F("MS5611 not found!"));
+    SERIALPRINT(F("MS5611 not found!"));
   }
   if (!tcs3400.begin()) {
-    Serial.print(F("TCS3400 not found!"));
+    SERIALPRINT(F("TCS3400 not found!"));
   }
-  Serial.println("i2c init complete");
+  SERIALPRINTLN("i2c init complete");
 
 }
 
