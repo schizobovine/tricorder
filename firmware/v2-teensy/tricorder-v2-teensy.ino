@@ -23,6 +23,8 @@
 #include <LTC2941.h>
 #include <SFE_LSM9DS0.h>
 #include <MS5611.h>
+#include <TCS3400.h>
+//#include <Adafruit_VEML6075.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -109,10 +111,12 @@ auto display = ssd1351::SSD1351<Color,Buffer,DISP_H,DISP_W>(DISP_CS, DISP_DC, DI
 
 // Sensors
 VEML6075           veml6075  = VEML6075();
+//Adafruit_VEML6075  veml6075  = Adafruit_VEML6075();
 Adafruit_MLX90614  mlx90614  = Adafruit_MLX90614();
 ClosedCube_HDC1080 hdc1080   = ClosedCube_HDC1080();
 LSM9DS0            lsm9ds0   = LSM9DS0(MODE_I2C, I2C_ADDR_LSM9DS0_G, I2C_ADDR_LSM9DS0_XM);
 MS5611             ms5611    = MS5611();
+TCS3400            tcs3400   = TCS3400();
 
 // Sensor values, current and last different value. The later is used to forego
 // screen updates (which are unfortunately slow) if the value has not changed.
@@ -129,22 +133,23 @@ typedef struct sensval {
   float color_temp = -1.0;    // (tcs3400) color temp
   float batt_v = -1.0;        // (ltc2942) XXX need to get that chip in there
   float batt_ma = -1.0;       // (ltc2942) TODO
-  float press_abs = -1.0;     // (ms5611) pressure (absolute)
-  float press_rel = -1.0;     // (ms5611) pressure (relative)
+  float pressure = -1.0;      // (ms5611) pressure (absolute)
   float lat = -1.0;           // (gps) latitude
   float lon = -1.0;           // (gps) longitude
   float alt = -1.0;           // (ms5611) altitude (m)
   float irtemp = -1.0;        // (mlx90614) temp (remote)
-  uint8_t color_r = 255;      // (tcs3400) red
-  uint8_t color_g = 255;      // (tcs3400) green
-  uint8_t color_b = 255;      // (tcs3400) blue
-  float acc_x = 0;         // (lsm9ds0) accelerometer
+  uint16_t color_r = 0xFFFF;  // (tcs3400) red
+  uint16_t color_g = 0xFFFF;  // (tcs3400) green
+  uint16_t color_b = 0xFFFF;  // (tcs3400) blue
+  uint16_t vis = 0x0;         // (tcs3400) clear (visible)
+  uint16_t ir = 0x0;          // (tcs3400) clear (visible)
+  float acc_x = 0;            // (lsm9ds0) accelerometer
   float acc_y = 0;
   float acc_z = 0;
-  float mag_x = 0;         // (lsm9ds0) magnetometer
+  float mag_x = 0;            // (lsm9ds0) magnetometer
   float mag_y = 0;
   float mag_z = 0;
-  float gyr_x = 0;         // (lsm9ds0) gyroscope
+  float gyr_x = 0;            // (lsm9ds0) gyroscope
   float gyr_y = 0;
   float gyr_z = 0;
 
@@ -207,99 +212,73 @@ float getBattVoltage() {
 void displayLabels() {
 
   //            <x>, <y>, <label_text>
-  //DISPLAY_LABEL(124,   8, F("V"));     // (ltc2941) battery voltage
-
-  DISPLAY_LABEL(  0,  16, F("RH"));    // (hdc1080) relative humidity
-  //DISPLAY_LABEL( 42,  16, F("%"));
-
-  DISPLAY_LABEL(  0,  24, F("Ta"));    // (hdc1080) temp (ambient)
-  //DISPLAY_LABEL( 42,  24, F(STR_DEG_C));
-  DISPLAY_LABEL(  0,  32, F("Tr"));    // (mlx90614) temp (remote)
-  //DISPLAY_LABEL( 42,  32, F(STR_DEG_C));
-
-  DISPLAY_LABEL(  0,  40, F("P"));     // (ms5611) pressure (absolute)
-  //DISPLAY_LABEL( 42,  40, F("kPa"));
-  //DISPLAY_LABEL( 60,  40, F("Pa"));    // (ms5611) pressure (absolute)
-  //DISPLAY_LABEL(116,  40, F("kPa"));
-  DISPLAY_LABEL( 60,  40, F("CT")); // (tcs3400) color temp
-  //DISPLAY_LABEL(100,  24, F("TEMP"));
-  //DISPLAY_LABEL(102,  40, F("K"));
+  DISPLAY_LABEL(  0,  16, F("RH"));                   // (hdc1080) relative humidity (%)
+  DISPLAY_LABEL(  0,  24, F("Ta"));                   // (hdc1080) temp (ambient deg C)
+  DISPLAY_LABEL(  0,  32, F("Tr"));                   // (mlx90614) temp (remote deg C)
+  DISPLAY_LABEL(  0,  40, F("P"));                    // (ms5611) pressure (abs kPa)
+  DISPLAY_LABEL(  0,  48, F("alt"));                  // (ms5611) altitude (m)
+  //DISPLAY_LABEL( 60,  40, F("CT"));                   // (tcs3400) color temp (K)
 
   //                <x>, <y>, <text>, <color>
-  DISPLAY_LABEL_RGB( 60,  16, F("R"), COLOR_RED);   // (tcs3400) red
-  DISPLAY_LABEL_RGB( 60,  24, F("G"), COLOR_GREEN); // (tcs3400) green
-  DISPLAY_LABEL_RGB( 60,  32, F("B"), COLOR_BLUE);  // (tcs3400) blue
+  DISPLAY_LABEL_RGB( 60,  16, F("R"), COLOR_RED);     // (tcs3400) red (word)
+  DISPLAY_LABEL_RGB( 60,  24, F("G"), COLOR_GREEN);   // (tcs3400) green (word)
+  DISPLAY_LABEL_RGB( 60,  32, F("B"), COLOR_BLUE);    // (tcs3400) blue (word)
                  
-  //DISPLAY_LABEL( 96,  16, F("COLOR")); // (tcs3400) color temp
-  //DISPLAY_LABEL(100,  24, F("TEMP"));
-  //DISPLAY_LABEL(124,  32, F("K"));
-                 
-  DISPLAY_LABEL(  0,  48, F("lat"));   // (gps) latitude
-  //DISPLAY_LABEL( 42,  48, F(STR_DEG));
-  DISPLAY_LABEL( 60,  48, F("lon"));   // (gps) longitude
-  //DISPLAY_LABEL(102,  48, F(STR_DEG));
-
-  DISPLAY_LABEL( 0,  56, F("alt"));   // (ms5611) altitude (m)
-  //DISPLAY_LABEL(102,  56, F("m"));
-
-  //DISPLAY_LABEL(  0,  56, F("IR"));    // (veml6075) IR channel (?)
-  //DISPLAY_LABEL(  0,  64, F("VIS"));   // (veml6075) visible channel (?)
-  DISPLAY_LABEL(  0,  72, F("UVI"));   // (veml6075) UV index
-  DISPLAY_LABEL(  0,  80, F("UVA"));   // (veml6075) UVA channel
-  DISPLAY_LABEL(  0,  88, F("UVB"));   // (veml6075) UVB channel
-                 
-  DISPLAY_LABEL(  0, 104, F("Acc (g)"));   // (lsm9ds0) accelerometer
-  DISPLAY_LABEL(  0, 112, F("Mag (G)"));   // (lsm9ds0) magnetometer
-  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s"));   // (lsm9ds0) gyroscope
-
-  DISPLAY_LABEL( 36,  96, F("X"));     // (lsm9ds0) x-values
-  DISPLAY_LABEL( 72,  96, F("Y"));     // (lsm9ds0) y-values
-  DISPLAY_LABEL(108,  96, F("Z"));     // (lsm9ds0) z-values
-
-  DISPLAY_LABEL( 70,  72, F("rIR"));   // (veml6075) raw IR channel
-  DISPLAY_LABEL( 66,  80, F("rVIS"));  // (veml6075) raw vis channel
-  DISPLAY_LABEL( 66,  88, F("dark"));  // (veml6075) raw dark channel
+  //            <x>, <y>, <label_text>
+  DISPLAY_LABEL( 60,  40, F("lat"));                  // (gps) latitude (deg)
+  DISPLAY_LABEL( 60,  48, F("lon"));                  // (gps) longitude (deg)
+  DISPLAY_LABEL(  0,  56, F("IR"));                   // (tcs3400) IR
+  DISPLAY_LABEL(  0,  64, F("VIS"));                  // (tcs3400) visible
+  DISPLAY_LABEL(  0,  72, F("UVI"));                  // (veml6075) UV index
+  DISPLAY_LABEL(  0,  80, F("UVA"));                  // (veml6075) UVA channel
+  DISPLAY_LABEL(  0,  88, F("UVB"));                  // (veml6075) UVB channel
+  //DISPLAY_LABEL( 70,  72, F("rIR"));                  // (veml6075) raw IR channel
+  //DISPLAY_LABEL( 66,  80, F("rVIS"));                 // (veml6075) raw vis channel
+  //DISPLAY_LABEL( 66,  88, F("dark"));                 // (veml6075) raw dark channel
+  DISPLAY_LABEL(  0, 104, F("Acc (g)"));              // (lsm9ds0) accelerometer (g)
+  DISPLAY_LABEL(  0, 112, F("Mag (G)"));              // (lsm9ds0) magnetometer (gauss)
+  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s"));   // (lsm9ds0) gyroscope (deg/s)
+  DISPLAY_LABEL( 36,  96, F("X"));                    // (lsm9ds0) x-values
+  DISPLAY_LABEL( 72,  96, F("Y"));                    // (lsm9ds0) y-values
+  DISPLAY_LABEL(108,  96, F("Z"));                    // (lsm9ds0) z-values
 
 }
 
 void displayValues_tcs3400() {
   // x, y, print_arg, $name
-  DISPLAY_READING( 70,  16, DEC, color_r);
-  DISPLAY_READING( 70,  24, DEC, color_g);
-  DISPLAY_READING( 70,  32, DEC, color_b);
-  DISPLAY_READING_UNIT( 70,  40, 0, color_temp, "K");
+  DISPLAY_READING( 74,  16, DEC, color_r);
+  DISPLAY_READING( 74,  24, DEC, color_g);
+  DISPLAY_READING( 74,  32, DEC, color_b);
+  DISPLAY_READING( 14,  56, DEC, ir);
+  DISPLAY_READING( 14,  64, DEC, vis);
+  //DISPLAY_READING_UNIT( 70,  40, 0, color_temp, "K");
 }
 
 void displayValues_veml6075() {
   // x, y, print_arg, $name
-  //DISPLAY_READING( 14, 56, 2, ir);
-  //DISPLAY_READING( 14, 64, 2, vis);
-  DISPLAY_READING( 14, 72, 2, uva);
-  DISPLAY_READING( 14, 80, 2, uvb);
-  DISPLAY_READING( 14, 88, 2, uvi);
-  DISPLAY_READING( 84, 72, DEC, raw_ir_comp);
-  DISPLAY_READING( 84, 80, DEC, raw_vis_comp);
-  DISPLAY_READING( 84, 88, DEC, raw_dark);
+  DISPLAY_READING( 14, 72, 2, uvi);
+  DISPLAY_READING( 14, 80, 2, uva);
+  DISPLAY_READING( 14, 88, 2, uvb);
+  //DISPLAY_READING( 84, 72, DEC, raw_ir_comp);
+  //DISPLAY_READING( 84, 80, DEC, raw_vis_comp);
+  //DISPLAY_READING( 84, 88, DEC, raw_dark);
 }
 
 void displayValues_mlx90614() {
-  // x, y, print_arg, $name
+  // x, y, print_arg, $name, unit
   DISPLAY_READING_UNIT(14, 32, 1, irtemp, STR_DEG_C);
 }
 
 void displayValues_hdc1080() {
-  // x, y, print_arg, $name
+  // x, y, print_arg, $name, unit
   DISPLAY_READING_UNIT(14, 16, 0, rh, "%");
   DISPLAY_READING_UNIT(14, 24, 1, temp, STR_DEG_C);
 }
 
 void displayValues_ms5611() {
-  // x, y, print_arg, $name
-  DISPLAY_READING_UNIT( 14,  40, 2, press_abs, " kPa");
-  //DISPLAY_READING( 14,  40, 2, press_rel);
-  //DISPLAY_READING( 74,  40, 2, press_abs);
-  //DISPLAY_READING_UNIT( 74,  56, 0, alt, " m");
-  DISPLAY_READING_UNIT( 14,  56, 0, alt, " m");
+  // x, y, print_arg, $name, unit
+  DISPLAY_READING_UNIT( 14,  40, 2, pressure, " kPa");
+  DISPLAY_READING_UNIT( 14,  48, 0,       alt, " m");
 }
 
 void displayValues_lsm9ds0() {
@@ -316,13 +295,13 @@ void displayValues_lsm9ds0() {
 }
 
 void displayValues_gps() {
-  // x, y, print_arg, $name
-  DISPLAY_READING_UNIT( 14,  48, 3, lat, STR_DEG);
+  // x, y, print_arg, $name, unit
+  DISPLAY_READING_UNIT( 74,  40, 3, lat, STR_DEG);
   DISPLAY_READING_UNIT( 74,  48, 3, lon, STR_DEG);
 }
 
 void displayValues_batt() {
-  // x, y, print_arg, $name
+  // x, y, print_arg, $name, unit
   DISPLAY_READING_UNIT( 106,   8, 2, batt_v, "V");
 }
 
@@ -374,12 +353,12 @@ void setup() {
   if (status != 0x49D4) {
     Serial.print(F("LSM9DS0 init failed! status="));
     Serial.println(status, HEX);
-  } else {
-    Serial.print(F("LSM9DS0 init success! status="));
-    Serial.println(status, HEX);
   }
   if (!ms5611.begin()) {
     Serial.print(F("MS5611 not found!"));
+  }
+  if (!tcs3400.begin()) {
+    Serial.print(F("TCS3400 not found!"));
   }
   Serial.println("i2c init complete");
 
@@ -396,15 +375,34 @@ void loop() {
   //static String now;
   //ts = rtc.now();
   //ts.iso8601(now);
+
+  // Get battery status
+  //curr.batt_v = getBattVoltage();
+  //curr.batt_ma = 0.0;
   
   // Poll VEML6075
-  veml6075.poll();
+  //veml6075.poll();
+  //curr.uva = veml6075.readUVA();
+  //curr.uvb = veml6075.readUVB();
+  //curr.uvi = veml6075.readUVI();
   curr.uva = veml6075.getUVA();
   curr.uvb = veml6075.getUVB();
   curr.uvi = veml6075.getUVIndex();
-  curr.raw_dark = veml6075.getRawDark();
-  curr.raw_ir_comp = veml6075.getRawIRComp();
-  curr.raw_vis_comp = veml6075.getRawVisComp();
+  //curr.raw_dark = veml6075.getRawDark();
+  //curr.raw_ir_comp = veml6075.getRawIRComp();
+  //curr.raw_vis_comp = veml6075.getRawVisComp();
+
+  // Poll TCS3400
+  curr.ir = tcs3400.getIR();
+  curr.vis = tcs3400.getVisible();
+  curr.color_r = tcs3400.getRed();
+  curr.color_g = tcs3400.getGreen();
+  curr.color_b = tcs3400.getBlue();
+
+  // Poll MS5611
+  curr.pressure = ms5611.readPressure();
+  curr.alt = ms5611.getAltitude(curr.pressure);
+  curr.pressure /= 1000.0; //convert to kPa for display
 
   // Poll HDC1080
   curr.temp = hdc1080.readTemperature();
@@ -431,18 +429,6 @@ void loop() {
   curr.gyr_y = lsm9ds0.calcGyro(lsm9ds0.gy);
   curr.gyr_z = lsm9ds0.calcGyro(lsm9ds0.gz);
 
-  /// curr.batt_v = getBattVoltage();
-
-  /// curr.ir = 0.0;
-  /// curr.vis = 0.0;
-  /// curr.color_r = 0.0;
-  /// curr.color_g = 0.0;
-  /// curr.color_b = 0.0;
-  /// curr.color_temp = 0.0;
-
-  curr.press_abs = 0.0;
-  curr.press_rel = 0.0;
-  curr.alt = 0.0;
 
   // Display readings refresh
   display.fillScreen(COLOR_BLACK);
@@ -458,6 +444,6 @@ void loop() {
   display.updateScreen();
 
   // Delay between data polls
-  delay(100);
+  delay(500);
 
 }
