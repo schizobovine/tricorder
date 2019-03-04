@@ -232,12 +232,12 @@ void displayLabels() {
   DISPLAY_LABEL(  0,  72, F("UVI"));                  // (veml6075) UV index
   DISPLAY_LABEL(  0,  80, F("UVA"));                  // (veml6075) UVA channel
   DISPLAY_LABEL(  0,  88, F("UVB"));                  // (veml6075) UVB channel
-  //DISPLAY_LABEL( 70,  72, F("rIR"));                  // (veml6075) raw IR channel
-  //DISPLAY_LABEL( 66,  80, F("rVIS"));                 // (veml6075) raw vis channel
-  //DISPLAY_LABEL( 66,  88, F("dark"));                 // (veml6075) raw dark channel
+  DISPLAY_LABEL( 70,  72, F("rIR"));                  // (veml6075) raw IR channel
+  DISPLAY_LABEL( 66,  80, F("rVIS"));                 // (veml6075) raw vis channel
+  DISPLAY_LABEL( 66,  88, F("dark"));                 // (veml6075) raw dark channel
   DISPLAY_LABEL(  0, 104, F("Acc (g)"));              // (lsm9ds0) accelerometer (g)
   DISPLAY_LABEL(  0, 112, F("Mag (G)"));              // (lsm9ds0) magnetometer (gauss)
-  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s"));   // (lsm9ds0) gyroscope (deg/s)
+  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s)"));  // (lsm9ds0) gyroscope (deg/s)
   DISPLAY_LABEL( 36,  96, F("X"));                    // (lsm9ds0) x-values
   DISPLAY_LABEL( 72,  96, F("Y"));                    // (lsm9ds0) y-values
   DISPLAY_LABEL(108,  96, F("Z"));                    // (lsm9ds0) z-values
@@ -259,9 +259,9 @@ void displayValues_veml6075() {
   DISPLAY_READING( 14, 72, 2, uvi);
   DISPLAY_READING( 14, 80, 2, uva);
   DISPLAY_READING( 14, 88, 2, uvb);
-  //DISPLAY_READING( 84, 72, DEC, raw_ir_comp);
-  //DISPLAY_READING( 84, 80, DEC, raw_vis_comp);
-  //DISPLAY_READING( 84, 88, DEC, raw_dark);
+  DISPLAY_READING( 84, 72, DEC, raw_ir_comp);
+  DISPLAY_READING( 84, 80, DEC, raw_vis_comp);
+  DISPLAY_READING( 84, 88, DEC, raw_dark);
 }
 
 void displayValues_mlx90614() {
@@ -381,16 +381,16 @@ void loop() {
   //curr.batt_ma = 0.0;
   
   // Poll VEML6075
-  //veml6075.poll();
   //curr.uva = veml6075.readUVA();
   //curr.uvb = veml6075.readUVB();
   //curr.uvi = veml6075.readUVI();
+  veml6075.poll();
   curr.uva = veml6075.getUVA();
   curr.uvb = veml6075.getUVB();
   curr.uvi = veml6075.getUVIndex();
-  //curr.raw_dark = veml6075.getRawDark();
-  //curr.raw_ir_comp = veml6075.getRawIRComp();
-  //curr.raw_vis_comp = veml6075.getRawVisComp();
+  curr.raw_dark = veml6075.getRawDark();
+  curr.raw_ir_comp = veml6075.getRawIRComp();
+  curr.raw_vis_comp = veml6075.getRawVisComp();
 
   // Poll TCS3400
   curr.ir = tcs3400.getIR();
