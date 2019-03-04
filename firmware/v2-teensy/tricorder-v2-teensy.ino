@@ -217,7 +217,6 @@ void displayLabels() {
   DISPLAY_LABEL(  0,  32, F("Tr"));                   // (mlx90614) temp (remote deg C)
   DISPLAY_LABEL(  0,  40, F("P"));                    // (ms5611) pressure (abs kPa)
   DISPLAY_LABEL(  0,  48, F("alt"));                  // (ms5611) altitude (m)
-  //DISPLAY_LABEL( 60,  40, F("CT"));                   // (tcs3400) color temp (K)
 
   //                <x>, <y>, <text>, <color>
   DISPLAY_LABEL_RGB( 60,  16, F("R"), COLOR_RED);     // (tcs3400) red (word)
@@ -251,7 +250,6 @@ void displayValues_tcs3400() {
   DISPLAY_READING( 74,  32, DEC, color_b);
   DISPLAY_READING( 14,  56, DEC, ir);
   DISPLAY_READING( 14,  64, DEC, vis);
-  //DISPLAY_READING_UNIT( 70,  40, 0, color_temp, "K");
 }
 
 void displayValues_veml6075() {
@@ -377,13 +375,10 @@ void loop() {
   //ts.iso8601(now);
 
   // Get battery status
-  //curr.batt_v = getBattVoltage();
-  //curr.batt_ma = 0.0;
+  curr.batt_v = getBattVoltage();
+  curr.batt_ma = 0.0;
   
   // Poll VEML6075
-  //curr.uva = veml6075.readUVA();
-  //curr.uvb = veml6075.readUVB();
-  //curr.uvi = veml6075.readUVI();
   veml6075.poll();
   curr.uva = veml6075.getUVA();
   curr.uvb = veml6075.getUVB();
