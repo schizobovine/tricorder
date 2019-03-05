@@ -24,6 +24,7 @@
 #include <SFE_LSM9DS0.h>
 #include <MS5611.h>
 #include <TCS3400.h>
+//#include <Adafruit_GPS.h>
 
 // Pin config
 
@@ -92,6 +93,8 @@ typedef ssd1351::SingleBuffer Buffer;
 #define I2C_ADDR_HDC1080    0x40
 #define I2C_ADDR_LSM9DS0_XM 0x1D //0x1E if SDO_XM is LOW
 #define I2C_ADDR_LSM9DS0_G  0x6B //0x6A if SDO_G is LOW
+#define GPS_UART (Serial3)
+#define GPS_UART_BAUD (9600)
 
 // MicroSD card log file
 File logfile;
@@ -107,6 +110,7 @@ ClosedCube_HDC1080 hdc1080   = ClosedCube_HDC1080();
 LSM9DS0            lsm9ds0   = LSM9DS0(MODE_I2C, I2C_ADDR_LSM9DS0_G, I2C_ADDR_LSM9DS0_XM);
 MS5611             ms5611    = MS5611();
 TCS3400            tcs3400   = TCS3400();
+//Adafruit_GPS       gps       = Adafruit_GPS(&GPS_UART);
 
 // Sensor values, current and last different value. The later is used to forego
 // screen updates (which are unfortunately slow) if the value has not changed.
@@ -145,7 +149,7 @@ typedef struct sensval {
 
 } sensval_t;
 
-sensval_t curr, last;
+sensval_t curr;
 
 //
 // Helper macros
@@ -170,14 +174,12 @@ sensval_t curr, last;
 
 #define DISPLAY_READING(x, y, print_arg, name) \
   do { \
-    last.name = curr.name; \
     display.setCursor((x), (y)); \
     display.print(curr.name, print_arg); \
   } while (0)
 
 #define DISPLAY_READING_UNIT(x, y, print_arg, name, unit) \
   do { \
-    last.name = curr.name; \
     display.setCursor((x), (y)); \
     display.print(curr.name, print_arg); \
     display.print(unit); \
@@ -352,6 +354,13 @@ void setup() {
   }
   SERIALPRINTLN("i2c init complete");
 
+  // Init GPS (it's a bit more complicated)
+  //gps.begin(GPS_UART_BAUD);
+  //gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  //gps.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
+  //gps.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
+  //gps.sendCommand(PGCMD_ANTENNA);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -416,6 +425,17 @@ void loop() {
   curr.gyr_y = lsm9ds0.calcGyro(lsm9ds0.gy);
   curr.gyr_z = lsm9ds0.calcGyro(lsm9ds0.gz);
 
+  // Poll GPS
+  //while (GPS_UART.available()) {
+  //  char c = gps.read();
+  //  SERIALPRINT(c);
+  //}
+  //if (gps.newNMEAreceived()) {
+  //  if (gps.parse(gps.lastNMEA())) {
+  //    curr.lat = gps.latitude;
+  //    curr.lon = gps.longitude;
+  //  }
+  //}
 
   // Display readings refresh
   display.fillScreen(COLOR_BLACK);
