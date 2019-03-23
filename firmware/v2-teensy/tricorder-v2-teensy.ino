@@ -13,18 +13,20 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
-#include <SD.h>
-#include <Adafruit_GFX.h>
-#include <ssd1351.h>
-#include <Adafruit_MLX90614.h>
-#include <ClosedCube_HDC1080.h>
-#include <VEML6075.h>
-#include <Time.h>
-#include <LTC2941.h>
-#include <SFE_LSM9DS0.h>
-#include <MS5611.h>
-#include <TCS3400.h>
 //#include <Adafruit_GPS.h>
+#include <Adafruit_MLX90614.h>
+#include <Adafruit_SGP30.h>
+#include <ClosedCube_HDC1080.h>
+#include <EEPROM.h>
+#include <LTC2941.h>
+#include <MS5611.h>
+#include <SD.h>
+#include <SFE_LSM9DS0.h>
+#include <ssd1351.h>
+#include <TCS3400.h>
+#include <Time.h>
+#include <TinyGPS.h>
+#include <VEML6075.h>
 
 // Pin config
 
@@ -86,6 +88,12 @@ typedef ssd1351::SingleBuffer Buffer;
 // "Special" characters
 #define STR_DEG   "\216"
 #define STR_DEG_C "\216C"
+#define SQUARED   "\220"
+
+// EEPROM addresses to store SGP30 calibration data
+#define SGP30_EEPROM_ADDR_TIME (0x06) /*uint31_t*/
+#define SGP30_EEPROM_ADDR_ECO2 (0x10) /*uint16_t*/
+#define SGP30_EEPROM_ADDR_TVOC (0x12) /*uint16_t*/
 
 // Misc
 #define SD_FILENAME ("tricorder.log")
@@ -95,6 +103,10 @@ typedef ssd1351::SingleBuffer Buffer;
 #define I2C_ADDR_LSM9DS0_G  0x6B //0x6A if SDO_G is LOW
 #define GPS_UART (Serial3)
 #define GPS_UART_BAUD (9600)
+
+// Physical constants (used for relative->abs humidity calc)
+const float WATER_G_PER_MOLE = 18.01534; // g/mol
+const float GAS_CONSTANT = 8.31447215;   // J/mol/K
 
 // MicroSD card log file
 File logfile;
@@ -111,11 +123,20 @@ LSM9DS0            lsm9ds0   = LSM9DS0(MODE_I2C, I2C_ADDR_LSM9DS0_G, I2C_ADDR_LS
 MS5611             ms5611    = MS5611();
 TCS3400            tcs3400   = TCS3400();
 //Adafruit_GPS       gps       = Adafruit_GPS(&GPS_UART);
+Adafruit_SGP30     sgp30     = Adafruit_SGP30();
+TinyGPS            gps       = TinyGPS();
 
 // Sensor values, current and last different value. The later is used to forego
 // screen updates (which are unfortunately slow) if the value has not changed.
 
 typedef struct sensval {
+  time_t now;                 // (RTC/GPS) UNIX epoch timestamp (seconds)
+  uint16_t year;              // (RTC/GPS) full 4 digit year (presume Gregorian)
+  uint8_t month;              // (RTC/GPS) month (1-12(?))
+  uint8_t day;                // (RTC/GPS) day (1-31(?))
+  uint8_t hour;               // (RTC/GPS) hours (0-23(?))
+  uint8_t minute;             // (RTC/GPS) minutes (0-59(?))
+  uint8_t second;             // (RTC/GPS) seconds (0-59(?))
   float uva = -1.0;           // (veml6075) UV index
   float uvb = -1.0;           // (veml6075) UVA channel
   float uvi = -1.0;           // (veml6075) UVB channel
@@ -130,6 +151,7 @@ typedef struct sensval {
   float pressure = -1.0;      // (ms5611) pressure (absolute)
   float lat = -1.0;           // (gps) latitude
   float lon = -1.0;           // (gps) longitude
+  uint32_t age = 0;           // (gps) time since last position fix
   float alt = -1.0;           // (ms5611) altitude (m)
   float irtemp = -1.0;        // (mlx90614) temp (remote)
   uint16_t color_r = 0xFFFF;  // (tcs3400) red
@@ -137,6 +159,8 @@ typedef struct sensval {
   uint16_t color_b = 0xFFFF;  // (tcs3400) blue
   uint16_t vis = 0x0;         // (tcs3400) clear (visible)
   uint16_t ir = 0x0;          // (tcs3400) clear (visible)
+  uint16_t eco2 = 0;          // (sgp30) estimated CO2
+  uint16_t tvoc = 0;          // (sgp30) total VOCs
   float acc_x = 0;            // (lsm9ds0) accelerometer
   float acc_y = 0;
   float acc_z = 0;
@@ -150,6 +174,25 @@ typedef struct sensval {
 } sensval_t;
 
 sensval_t curr;
+
+// SGP30 baseline values & absolute humidity vars
+uint16_t sgp30_baseline_eco2 = 0;
+uint16_t sgp30_baseline_tvoc = 0;
+uint16_t sgp30_abs_humidity = 0;
+
+// Is current baseline data valid?
+bool sgp30_baseline_valid = false;
+
+// Timestamp of last baseline fetch
+uint32_t sgp30_baseline_time = 0;
+
+// If we're starting a new baseline, this is the timestamp of when we started.
+// Need to wait 12 hours (according to the datasheet) before it's valid to
+// save.
+uint32_t sgq30_baseline_start = 0;
+
+// If we've received data on the GPS UART port
+volatile bool new_gps_data = false;
 
 //
 // Helper macros
@@ -188,7 +231,13 @@ sensval_t curr;
 #define SERIALPRINT(...)   if (Serial) { Serial.print(__VA_ARGS__);   }
 #define SERIALPRINTLN(...) if (Serial) { Serial.println(__VA_ARGS__); }
 
+// Controls if GPS data is dumped over Serial for debugging purposes
+#define DEBUG_GPS (0)
+
+// Tempeture conversion macros
 #define C_TO_F(x) ((x) * 9.0/5.0 + 32.0)
+#define C_TO_K(x) ((x) + 273.15)
+#define K_TO_C(x) ((x) - 273.15)
 
 ////////////////////////////////////////////////////////////////////////
 // HALPING
@@ -200,6 +249,100 @@ float getBattVoltage() {
   return 0.0;
 }
 
+// Loads baseline data from EEPROM
+void loadBaseline() {
+  uint8_t b0, b1, b2, b3;
+
+  b3 = EEPROM.read(SGP30_EEPROM_ADDR_TIME);
+  b2 = EEPROM.read(SGP30_EEPROM_ADDR_TIME+1);
+  b1 = EEPROM.read(SGP30_EEPROM_ADDR_TIME+2);
+  b0 = EEPROM.read(SGP30_EEPROM_ADDR_TIME+3);
+  sgp30_baseline_time = (b3<<24) | (b2<<16) | (b1<<8) | b0;
+
+  b1 = EEPROM.read(SGP30_EEPROM_ADDR_ECO2);
+  b0 = EEPROM.read(SGP30_EEPROM_ADDR_ECO2+1);
+  sgp30_baseline_eco2 = (b1<<8) | b0;
+
+  b1 = EEPROM.read(SGP30_EEPROM_ADDR_TVOC);
+  b0 = EEPROM.read(SGP30_EEPROM_ADDR_TVOC+1);
+  sgp30_baseline_tvoc = (b1<<8) | b0;
+
+}
+
+// Save baseline data to EEPROM
+void saveBaseline() {
+  uint8_t b0, b1, b2, b3;
+
+  b0 = (uint8_t)((sgp30_baseline_time)       & 0xFF);
+  b1 = (uint8_t)((sgp30_baseline_time) >>  8 & 0xFF);
+  b2 = (uint8_t)((sgp30_baseline_time) >> 16 & 0xFF);
+  b3 = (uint8_t)((sgp30_baseline_time) >> 24 & 0xFF);
+  EEPROM.write(b3, SGP30_EEPROM_ADDR_TIME);
+  EEPROM.write(b2, SGP30_EEPROM_ADDR_TIME+1);
+  EEPROM.write(b1, SGP30_EEPROM_ADDR_TIME+2);
+  EEPROM.write(b0, SGP30_EEPROM_ADDR_TIME+3);
+
+  b0 = (uint8_t)((sgp30_baseline_eco2)       & 0xFF);
+  b1 = (uint8_t)((sgp30_baseline_eco2 >>  8) & 0xFF);
+  EEPROM.write(b1, SGP30_EEPROM_ADDR_ECO2);
+  EEPROM.write(b0, SGP30_EEPROM_ADDR_ECO2+1);
+
+  b0 = (uint8_t)((sgp30_baseline_tvoc)       & 0xFF);
+  b1 = (uint8_t)((sgp30_baseline_tvoc >>  8) & 0xFF);
+  EEPROM.write(b1, SGP30_EEPROM_ADDR_TVOC);
+  EEPROM.write(b0, SGP30_EEPROM_ADDR_TVOC+1);
+
+}
+
+//
+// Annoyingly, the SGP30 humidity compensation must be specified in terms of
+// absolute humidity (g/m^3) instead of relative humidity (%). Conversion using
+// ideal gas law + formula for saturation of water vapor based on current
+// temperature.
+//
+// Reference:
+//https://carnotcycle.wordpress.com/2012/08/04/how-to-convert-relative-humidity-to-absolute-humidity/
+//
+uint16_t relativeToAbsoluteHumidity(float rh, float tempC) {
+  float p;
+
+  // Get maximum saturation pressure of water vapor at current temp
+  p = 6.112 * pow(M_E, (17.67 / tempC) / (tempC + 243.5));
+
+  // If we're at x% humidity, the water vapor pressure should be that
+  // percentage of the saturation value.
+  p = p * (rh / 100.0);
+
+  // Use ideal gas law (PV=nRT) to infer the density of water in a cubic meter
+  // of air. Assume v = 1 m^3, solve for n:
+  //      P * V     P
+  //  n = ----- = -----
+  //      R * T   R * T
+  float n = p / (GAS_CONSTANT * C_TO_K(tempC));
+
+  // Finally, given n, calculate density:
+  //                          1
+  // density = v/m = --------------------
+  //                 n * WATER_G_PER_MOLE
+  //
+  float density = 1 / (n * WATER_G_PER_MOLE);
+
+  // Finally, convert the density into the weirdo format the SGP30 expects it
+  // in (16bit, fixed precision 8.8)
+  double i, f;
+  uint8_t msb, lsb;
+
+  f = modf(density, &i);
+  msb = lrint(i) % 256;
+  lsb = lrint(f * 256) & 0xFF;
+
+  return (msb<<8) | lsb;
+}
+
+time_t getTeensy3Time(void) {
+  return Teensy3Clock.get();
+}
+
 void displayLabels() {
 
   //            <x>, <y>, <label_text>
@@ -208,6 +351,17 @@ void displayLabels() {
   DISPLAY_LABEL(  0,  32, F("Tr"));                   // (mlx90614) temp (remote deg C)
   DISPLAY_LABEL(  0,  40, F("P"));                    // (ms5611) pressure (abs kPa)
   DISPLAY_LABEL(  0,  48, F("alt"));                  // (ms5611) altitude (m)
+  DISPLAY_LABEL(  0,  56, F("IR"));                   // (tcs3400) IR
+  DISPLAY_LABEL(  0,  64, F("VIS"));                  // (tcs3400) visible
+  DISPLAY_LABEL(  0,  72, F("UVI"));                  // (veml6075) UV index
+  DISPLAY_LABEL(  0,  80, F("UVA"));                  // (veml6075) UVA channel
+  DISPLAY_LABEL(  0,  88, F("UVB"));                  // (veml6075) UVB channel
+  DISPLAY_LABEL(  0, 104, F("Acc (g)"));              // (lsm9ds0) accelerometer (g)
+  DISPLAY_LABEL(  0, 112, F("Mag (G)"));              // (lsm9ds0) magnetometer (gauss)
+  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s)"));  // (lsm9ds0) gyroscope (deg/s)
+  DISPLAY_LABEL( 36,  96, F("X"));                    // (lsm9ds0) x-values
+  DISPLAY_LABEL( 72,  96, F("Y"));                    // (lsm9ds0) y-values
+  DISPLAY_LABEL(108,  96, F("Z"));                    // (lsm9ds0) z-values
 
   //                <x>, <y>, <text>, <color>
   DISPLAY_LABEL_RGB( 60,  16, F("R"), COLOR_RED);     // (tcs3400) red (word)
@@ -217,20 +371,11 @@ void displayLabels() {
   //            <x>, <y>, <label_text>
   DISPLAY_LABEL( 60,  40, F("lat"));                  // (gps) latitude (deg)
   DISPLAY_LABEL( 60,  48, F("lon"));                  // (gps) longitude (deg)
-  DISPLAY_LABEL(  0,  56, F("IR"));                   // (tcs3400) IR
-  DISPLAY_LABEL(  0,  64, F("VIS"));                  // (tcs3400) visible
-  DISPLAY_LABEL(  0,  72, F("UVI"));                  // (veml6075) UV index
-  DISPLAY_LABEL(  0,  80, F("UVA"));                  // (veml6075) UVA channel
-  DISPLAY_LABEL(  0,  88, F("UVB"));                  // (veml6075) UVB channel
-  DISPLAY_LABEL( 70,  72, F("rIR"));                  // (veml6075) raw IR channel
-  DISPLAY_LABEL( 66,  80, F("rVIS"));                 // (veml6075) raw vis channel
-  DISPLAY_LABEL( 66,  88, F("dark"));                 // (veml6075) raw dark channel
-  DISPLAY_LABEL(  0, 104, F("Acc (g)"));              // (lsm9ds0) accelerometer (g)
-  DISPLAY_LABEL(  0, 112, F("Mag (G)"));              // (lsm9ds0) magnetometer (gauss)
-  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s)"));  // (lsm9ds0) gyroscope (deg/s)
-  DISPLAY_LABEL( 36,  96, F("X"));                    // (lsm9ds0) x-values
-  DISPLAY_LABEL( 72,  96, F("Y"));                    // (lsm9ds0) y-values
-  DISPLAY_LABEL(108,  96, F("Z"));                    // (lsm9ds0) z-values
+  DISPLAY_LABEL( 60,  56, F("CO" SQUARED));           // (sgp30) estimated CO2
+  DISPLAY_LABEL( 60,  64, F("VOC"));                  // (sgp30) total VOC
+  DISPLAY_LABEL( 60,  72, F("rIR"));                  // (veml6075) raw IR channel
+  DISPLAY_LABEL( 56,  80, F("rVIS"));                 // (veml6075) raw vis channel
+  DISPLAY_LABEL( 56,  88, F("dark"));                 // (veml6075) raw dark channel
 
 }
 
@@ -248,9 +393,9 @@ void displayValues_veml6075() {
   DISPLAY_READING( 14, 72, 2, uvi);
   DISPLAY_READING( 14, 80, 2, uva);
   DISPLAY_READING( 14, 88, 2, uvb);
-  DISPLAY_READING( 84, 72, DEC, raw_ir_comp);
-  DISPLAY_READING( 84, 80, DEC, raw_vis_comp);
-  DISPLAY_READING( 84, 88, DEC, raw_dark);
+  DISPLAY_READING( 74, 72, DEC, raw_ir_comp);
+  DISPLAY_READING( 74, 80, DEC, raw_vis_comp);
+  DISPLAY_READING( 74, 88, DEC, raw_dark);
 }
 
 void displayValues_mlx90614() {
@@ -289,9 +434,68 @@ void displayValues_gps() {
   DISPLAY_READING_UNIT( 74,  48, 3, lon, STR_DEG);
 }
 
+void displayValues_sgp30() {
+  // x, y, print_arg, $name, unit
+  DISPLAY_READING_UNIT( 74, 56, DEC, eco2, " ppm");
+  DISPLAY_READING_UNIT( 74, 64, DEC, tvoc, " ppb");
+}
+
 void displayValues_batt() {
   // x, y, print_arg, $name, unit
   DISPLAY_READING_UNIT( 106,   8, 2, batt_v, "V");
+}
+
+void displayValues_datetime() {
+
+  // x, y, print_arg, $name, "unit"
+
+  DISPLAY_READING(   0,   8, DEC, year);
+
+  DISPLAY_LABEL  (  15,   8, F("-"));
+
+  if (curr.month < 10) {
+    DISPLAY_LABEL  (  19,   8, F("0"));
+    DISPLAY_READING(  23,   8, DEC, month);
+  } else {
+    DISPLAY_READING(  19,   8, DEC, month);
+  }
+  
+  DISPLAY_LABEL  (  27,   8, F("-"));
+
+  if (curr.day < 10) {
+    DISPLAY_LABEL  (  31,   8, F("0"));
+    DISPLAY_READING(  35,   8, DEC, day);
+  } else {
+    DISPLAY_READING(  31,   8, DEC, day);
+  }
+
+  //DISPLAY_LABEL  (  39,   8, F("Z"));
+
+  if (curr.hour < 10) {
+    DISPLAY_LABEL  (  43,   8, F("0"));
+    DISPLAY_READING(  47,   8, DEC, hour);
+  } else {
+    DISPLAY_READING(  43,   8, DEC, hour);
+  }
+
+  DISPLAY_LABEL  (  51,   8, F(":"));
+
+  if (curr.minute < 10) {
+    DISPLAY_LABEL  (  53,   8, F("0"));
+    DISPLAY_READING(  57,   8, DEC, minute);
+  } else {
+    DISPLAY_READING(  53,   8, DEC, minute);
+  }
+
+  DISPLAY_LABEL  (  61,   8, F(":"));
+
+  if (curr.second < 10) {
+    DISPLAY_LABEL  (  63,   8, F("0"));
+    DISPLAY_READING(  67,   8, DEC, second);
+  } else {
+    DISPLAY_READING(  63,   8, DEC, second);
+  }
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -307,8 +511,22 @@ void setup() {
     SERIALPRINTLN(F("Tricorder v2.0-teensy (Built " __DATE__ " " __TIME__")"));
   }
 
+  // Setup RTC
+  setSyncProvider(getTeensy3Time);
+  if (timeStatus() != timeSet) {
+    SERIALPRINTLN(F("RTC sync failed!"));
+  } else {
+    SERIALPRINTLN(F("system clock synced with RTC"));
+  }
+
   // Setup ADC
   analogReadResolution(ANALOG_RES);
+
+  // Init GPS (it's a bit more complicated)
+  if (GPS_UART) {
+    GPS_UART.begin(GPS_UART_BAUD);
+    SERIALPRINTLN("GPS UART init complete");
+  }
 
   // Check if SD card is present (shorts to ground if not present)
   pinMode(SD_CARDSW, INPUT_PULLUP);
@@ -334,33 +552,60 @@ void setup() {
   display.updateScreen();
   SERIALPRINTLN("display init complete");
 
-  // Init i2C
+  // Init I2C and then sensors on that bus
   Wire.begin();
 
-  // Init sensors
   veml6075.begin();
   mlx90614.begin(); 
   hdc1080.begin(I2C_ADDR_HDC1080);
+
   uint16_t status = lsm9ds0.begin();
   if (status != 0x49D4) {
     SERIALPRINT(F("LSM9DS0 init failed! status="));
     SERIALPRINTLN(status, HEX);
   }
+
   if (!ms5611.begin()) {
     SERIALPRINT(F("MS5611 not found!"));
   }
+
   if (!tcs3400.begin()) {
     SERIALPRINT(F("TCS3400 not found!"));
   }
-  SERIALPRINTLN("i2c init complete");
 
-  // Init GPS (it's a bit more complicated)
+  if (!sgp30.begin()) {
+    SERIALPRINT(F("SGP30 not found!"));
+  } else {
+    loadBaseline();
+    if (sgp30_baseline_time == 0xFFFFFFFF) {
+      sgp30_baseline_valid = false;
+    } else {
+      sgp30_baseline_valid = true;
+      sgp30.setIAQBaseline(sgp30_baseline_eco2, sgp30_baseline_tvoc);
+    }
+  }
+
+  SERIALPRINTLN("i2c init complete");
   //gps.begin(GPS_UART_BAUD);
   //gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   //gps.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
   //gps.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
   //gps.sendCommand(PGCMD_ANTENNA);
 
+}
+
+// Callback that fires when data is received on Serial3, where the GPS is
+// hooked up
+void serialEvent3(void) {
+  while (GPS_UART.available()) {
+    char c = GPS_UART.read();
+    if (gps.encode(c)) {
+      new_gps_data = true;
+    }
+#if (DEBUG_GPS)
+    SERIALPRINT(c);
+#endif
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -370,10 +615,13 @@ void setup() {
 void loop() {
 
   // Poll RTC for time (UTC)
-  //static DateTime ts;
-  //static String now;
-  //ts = rtc.now();
-  //ts.iso8601(now);
+  time_t now  = getTeensy3Time();
+  curr.year   = year(now);
+  curr.month  = month(now);
+  curr.day    = day(now);
+  curr.hour   = hour(now);
+  curr.minute = minute(now);
+  curr.second = second(now);
 
   // Get battery status
   curr.batt_v = getBattVoltage();
@@ -403,6 +651,7 @@ void loop() {
   // Poll HDC1080
   curr.temp = hdc1080.readTemperature();
   curr.rh = hdc1080.readHumidity();
+  sgp30_abs_humidity = relativeToAbsoluteHumidity(curr.rh, curr.temp);
 
   // Poll MLX90614
   curr.irtemp = mlx90614.readObjectTempC();
@@ -426,20 +675,29 @@ void loop() {
   curr.gyr_z = lsm9ds0.calcGyro(lsm9ds0.gz);
 
   // Poll GPS
-  //while (GPS_UART.available()) {
-  //  char c = gps.read();
-  //  SERIALPRINT(c);
-  //}
+  if (new_gps_data) {
+    new_gps_data = false;
+    gps.f_get_position(&curr.lat, &curr.lon, &curr.age);
+    //gps.crack_datetime(
+    //  &curr.year, &curr.month, &curr.day,
+    //  &curr.hour, &curr.minute, &curr.second,
+    //  NULL, /* hundredths */
+    //  NULL  /* age */
+    //);
+  }
   //if (gps.newNMEAreceived()) {
-  //  if (gps.parse(gps.lastNMEA())) {
-  //    curr.lat = gps.latitude;
-  //    curr.lon = gps.longitude;
-  //  }
+    //if (gps.parse(gps.lastNMEA())) {
+      //curr.lat = gps.latitude;
+      //curr.lon = gps.longitude;
+    //}
   //}
+
+  // Poll SGP30
 
   // Display readings refresh
   display.fillScreen(COLOR_BLACK);
   displayLabels();
+  displayValues_datetime();
   displayValues_hdc1080(); 
   displayValues_mlx90614();
   displayValues_veml6075();
@@ -447,6 +705,7 @@ void loop() {
   displayValues_ms5611();
   displayValues_lsm9ds0();
   displayValues_gps();
+  displayValues_sgp30();
   displayValues_batt();
   display.updateScreen();
 
