@@ -15,12 +15,12 @@
 #include <Wire.h>
 #include <Adafruit_MLX90614.h>
 #include <Adafruit_SGP30.h>
+#include <Adafruit_FXOS8700.h>
+#include <Adafruit_FXAS21002C.h>
 #include <ClosedCube_HDC1080.h>
 #include <EEPROM.h>
 #include <LTC2941.h>
-#include <MS5611.h>
 #include <SD.h>
-#include <SFE_LSM9DS0.h>
 #include <ssd1351.h>
 #include <TCS3400.h>
 #include <Time.h>
@@ -115,14 +115,15 @@ bool card_present = false;
 auto display = ssd1351::SSD1351<Color,Buffer,DISP_H,DISP_W>(DISP_CS, DISP_DC, DISP_RST);
 
 // Sensors
-VEML6075           veml6075  = VEML6075();
-Adafruit_MLX90614  mlx90614  = Adafruit_MLX90614();
-ClosedCube_HDC1080 hdc1080   = ClosedCube_HDC1080();
-LSM9DS0            lsm9ds0   = LSM9DS0(MODE_I2C, I2C_ADDR_LSM9DS0_G, I2C_ADDR_LSM9DS0_XM);
-MS5611             ms5611    = MS5611();
-TCS3400            tcs3400   = TCS3400();
-Adafruit_SGP30     sgp30     = Adafruit_SGP30();
-TinyGPS            gps       = TinyGPS();
+VEML6075            veml6075  = VEML6075();
+Adafruit_MLX90614   mlx90614  = Adafruit_MLX90614();
+ClosedCube_HDC1080  hdc1080   = ClosedCube_HDC1080();
+//MS5611              ms5611    = MS5611();
+TCS3400             tcs3400   = TCS3400();
+Adafruit_SGP30      sgp30     = Adafruit_SGP30();
+TinyGPS             gps       = TinyGPS();
+Adafruit_FXAS21002C gyro      = Adafruit_FXAS21002C();
+Adafruit_FXOS8700   accmag    = Adafruit_FXOS8700();
 
 // Sensor values, current and last different value. The later is used to forego
 // screen updates (which are unfortunately slow) if the value has not changed.
@@ -159,13 +160,13 @@ typedef struct sensval {
   uint16_t ir = 0x0;          // (tcs3400) clear (visible)
   uint16_t eco2 = 0;          // (sgp30) estimated CO2
   uint16_t tvoc = 0;          // (sgp30) total VOCs
-  float acc_x = 0;            // (lsm9ds0) accelerometer
+  float acc_x = 0;            // (fxos8700) accelerometer
   float acc_y = 0;
   float acc_z = 0;
-  float mag_x = 0;            // (lsm9ds0) magnetometer
+  float mag_x = 0;            // (fxos8700) magnetometer
   float mag_y = 0;
   float mag_z = 0;
-  float gyr_x = 0;            // (lsm9ds0) gyroscope
+  float gyr_x = 0;            // (fxas21002c) gyroscope
   float gyr_y = 0;
   float gyr_z = 0;
 
@@ -223,6 +224,14 @@ volatile bool new_gps_data = false;
   do { \
     display.setCursor((x), (y)); \
     display.print(curr.name, print_arg); \
+    display.print(unit); \
+  } while (0)
+
+#define DISPLAY_READING_UNIT_PLUSMINUS(x, y, print_arg, name, unit) \
+  do { \
+    display.setCursor((x), (y)); \
+    display.print((curr.name > 0) ? F("+") : F("-")); \
+    display.print(abs(curr.name), print_arg); \
     display.print(unit); \
   } while (0)
 
@@ -354,12 +363,12 @@ void displayLabels() {
   DISPLAY_LABEL(  0,  72, F("UVI"));                  // (veml6075) UV index
   DISPLAY_LABEL(  0,  80, F("UVA"));                  // (veml6075) UVA channel
   DISPLAY_LABEL(  0,  88, F("UVB"));                  // (veml6075) UVB channel
-  DISPLAY_LABEL(  0, 104, F("Acc (g)"));              // (lsm9ds0) accelerometer (g)
-  DISPLAY_LABEL(  0, 112, F("Mag (G)"));              // (lsm9ds0) magnetometer (gauss)
-  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s)"));  // (lsm9ds0) gyroscope (deg/s)
-  DISPLAY_LABEL( 36,  96, F("X"));                    // (lsm9ds0) x-values
-  DISPLAY_LABEL( 72,  96, F("Y"));                    // (lsm9ds0) y-values
-  DISPLAY_LABEL(108,  96, F("Z"));                    // (lsm9ds0) z-values
+  DISPLAY_LABEL(  0, 104, F("Acc (m/s" SQUARED")"));  // (fxos8700) accelerometer (m/s^2)
+  DISPLAY_LABEL(  0, 112, F("Mag (uT)"));             // (fxos8700) magnetometer (microtesla)
+  DISPLAY_LABEL(  0, 120, F("Gyr (" STR_DEG "/s)"));  // (fxas21002c) gyroscope (deg/s)
+  DISPLAY_LABEL( 36,  96, F("X"));                    // (fxos8700/fxas21002c) x-values
+  DISPLAY_LABEL( 72,  96, F("Y"));                    // (fxos8700/fxas21002c) y-values
+  DISPLAY_LABEL(108,  96, F("Z"));                    // (fxos8700/fxas21002c) z-values
 
   //                <x>, <y>, <text>, <color>
   DISPLAY_LABEL_RGB( 60,  16, F("R"), COLOR_RED);     // (tcs3400) red (word)
@@ -413,7 +422,7 @@ void displayValues_ms5611() {
   DISPLAY_READING_UNIT( 14,  48, 0,       alt, " m");
 }
 
-void displayValues_lsm9ds0() {
+void displayValues_9dof() {
   // x, y, print_arg, $name
   DISPLAY_READING( 36, 104, 2, acc_x);
   DISPLAY_READING( 72, 104, 2, acc_y);
@@ -428,8 +437,8 @@ void displayValues_lsm9ds0() {
 
 void displayValues_gps() {
   // x, y, print_arg, $name, unit
-  DISPLAY_READING_UNIT( 74,  40, 3, lat, STR_DEG);
-  DISPLAY_READING_UNIT( 74,  48, 3, lon, STR_DEG);
+  DISPLAY_READING_UNIT_PLUSMINUS( 79,  40, 3, lat, STR_DEG);
+  DISPLAY_READING_UNIT_PLUSMINUS( 79,  48, 3, lon, STR_DEG);
 }
 
 void displayValues_sgp30() {
@@ -542,19 +551,21 @@ void setup() {
 
   // Init I2C and then sensors on that bus
   Wire.begin();
+  SERIALPRINTLN("Wire init complete");
 
   veml6075.begin();
+  SERIALPRINTLN("VEML6075 init complete");
   mlx90614.begin(); 
+  SERIALPRINTLN("MLX90614 init complete");
   hdc1080.begin(I2C_ADDR_HDC1080);
+  SERIALPRINTLN("HDC1080 init complete");
 
-  uint16_t status = lsm9ds0.begin();
-  if (status != 0x49D4) {
-    SERIALPRINT(F("LSM9DS0 init failed! status="));
-    SERIALPRINTLN(status, HEX);
+  if (!accmag.begin()) {
+    SERIALPRINTLN("FXOS8700 accelerometer/magnetometer not found!");
   }
 
-  if (!ms5611.begin()) {
-    SERIALPRINT(F("MS5611 not found!"));
+  if (!gyro.begin()) {
+    SERIALPRINTLN("FXAS21002C gyroscope not found!");
   }
 
   if (!tcs3400.begin()) {
@@ -626,9 +637,9 @@ void loop() {
   curr.color_b = tcs3400.getBlue();
 
   // Poll MS5611
-  curr.pressure = ms5611.readPressure();
-  curr.alt = ms5611.getAltitude(curr.pressure);
-  curr.pressure /= 1000.0; //convert to kPa for display
+  //curr.pressure = ms5611.readPressure();
+  //curr.alt = ms5611.getAltitude(curr.pressure);
+  //curr.pressure /= 1000.0; //convert to kPa for display
 
   // Poll HDC1080
   curr.temp = hdc1080.readTemperature();
@@ -638,23 +649,14 @@ void loop() {
   // Poll MLX90614
   curr.irtemp = mlx90614.readObjectTempC();
 
-  // Poll LSM9DS0 accelerometer
-  lsm9ds0.readAccel();
-  curr.acc_x = lsm9ds0.calcAccel(lsm9ds0.ax); // converts to g
-  curr.acc_y = lsm9ds0.calcAccel(lsm9ds0.ay); // (i.e., 1g = 9.8m/s^2)
-  curr.acc_z = lsm9ds0.calcAccel(lsm9ds0.az);
+  // Poll FXOS8700 accelerometer/magnetometer
+  accmag.updateRaw();
+  accmag.getAccelerometer(&(curr.acc_x), &(curr.acc_y), &(curr.acc_z));
+  accmag.getMagnetometer(&(curr.mag_x), &(curr.mag_y), &(curr.mag_z));
 
-  // Poll LSM9DS0 magnetometer
-  lsm9ds0.readMag();
-  curr.mag_x = lsm9ds0.calcMag(lsm9ds0.mx); // converts to Gauss
-  curr.mag_y = lsm9ds0.calcMag(lsm9ds0.my);
-  curr.mag_z = lsm9ds0.calcMag(lsm9ds0.mz);
-
-  // Poll LSM9DS0 gyroscope
-  lsm9ds0.readGyro();
-  curr.gyr_x = lsm9ds0.calcGyro(lsm9ds0.gx); // converts to deg/s
-  curr.gyr_y = lsm9ds0.calcGyro(lsm9ds0.gy);
-  curr.gyr_z = lsm9ds0.calcGyro(lsm9ds0.gz);
+  // Poll FXAS21002C gyroscope
+  gyro.updateRaw();
+  gyro.getLastData(&(curr.gyr_x), &(curr.gyr_y), &(curr.gyr_z), false);
 
   // Poll GPS
   if (new_gps_data) {
@@ -669,6 +671,7 @@ void loop() {
   }
 
   // Poll SGP30
+  // TODO
 
   // Display readings refresh
   display.fillScreen(COLOR_BLACK);
@@ -679,7 +682,7 @@ void loop() {
   displayValues_veml6075();
   displayValues_tcs3400();
   displayValues_ms5611();
-  displayValues_lsm9ds0();
+  displayValues_9dof();
   displayValues_gps();
   displayValues_sgp30();
   displayValues_batt();
