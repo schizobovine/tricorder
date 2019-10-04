@@ -13,7 +13,6 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <Wire.h>
-//#include <Adafruit_GPS.h>
 #include <Adafruit_MLX90614.h>
 #include <Adafruit_SGP30.h>
 #include <ClosedCube_HDC1080.h>
@@ -122,7 +121,6 @@ ClosedCube_HDC1080 hdc1080   = ClosedCube_HDC1080();
 LSM9DS0            lsm9ds0   = LSM9DS0(MODE_I2C, I2C_ADDR_LSM9DS0_G, I2C_ADDR_LSM9DS0_XM);
 MS5611             ms5611    = MS5611();
 TCS3400            tcs3400   = TCS3400();
-//Adafruit_GPS       gps       = Adafruit_GPS(&GPS_UART);
 Adafruit_SGP30     sgp30     = Adafruit_SGP30();
 TinyGPS            gps       = TinyGPS();
 
@@ -446,13 +444,9 @@ void displayValues_batt() {
 }
 
 void displayValues_datetime() {
-
   // x, y, print_arg, $name, "unit"
-
   DISPLAY_READING(   0,   8, DEC, year);
-
   DISPLAY_LABEL  (  15,   8, F("-"));
-
   if (curr.month < 10) {
     DISPLAY_LABEL  (  19,   8, F("0"));
     DISPLAY_READING(  23,   8, DEC, month);
@@ -461,7 +455,6 @@ void displayValues_datetime() {
   }
   
   DISPLAY_LABEL  (  27,   8, F("-"));
-
   if (curr.day < 10) {
     DISPLAY_LABEL  (  31,   8, F("0"));
     DISPLAY_READING(  35,   8, DEC, day);
@@ -477,25 +470,20 @@ void displayValues_datetime() {
   } else {
     DISPLAY_READING(  43,   8, DEC, hour);
   }
-
   DISPLAY_LABEL  (  51,   8, F(":"));
-
   if (curr.minute < 10) {
     DISPLAY_LABEL  (  53,   8, F("0"));
     DISPLAY_READING(  57,   8, DEC, minute);
   } else {
     DISPLAY_READING(  53,   8, DEC, minute);
   }
-
   DISPLAY_LABEL  (  61,   8, F(":"));
-
   if (curr.second < 10) {
     DISPLAY_LABEL  (  63,   8, F("0"));
     DISPLAY_READING(  67,   8, DEC, second);
   } else {
     DISPLAY_READING(  63,   8, DEC, second);
   }
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -584,13 +572,7 @@ void setup() {
       sgp30.setIAQBaseline(sgp30_baseline_eco2, sgp30_baseline_tvoc);
     }
   }
-
   SERIALPRINTLN("i2c init complete");
-  //gps.begin(GPS_UART_BAUD);
-  //gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-  //gps.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
-  //gps.sendCommand(PMTK_API_SET_FIX_CTL_1HZ);
-  //gps.sendCommand(PGCMD_ANTENNA);
 
 }
 
@@ -685,12 +667,6 @@ void loop() {
     //  NULL  /* age */
     //);
   }
-  //if (gps.newNMEAreceived()) {
-    //if (gps.parse(gps.lastNMEA())) {
-      //curr.lat = gps.latitude;
-      //curr.lon = gps.longitude;
-    //}
-  //}
 
   // Poll SGP30
 
